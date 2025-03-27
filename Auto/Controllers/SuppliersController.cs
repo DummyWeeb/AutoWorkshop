@@ -54,7 +54,7 @@ namespace Auto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SupplierId,Name,ContactInfo")] Supplier supplier)
+        public async Task<IActionResult> Create([Bind("SupplierId,Name,Address,Phone,Email")] Supplier supplier)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace Auto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("SupplierId,Name,ContactInfo")] Supplier supplier)
+        public async Task<IActionResult> Edit(int id, [Bind("SupplierId,Name,Address,Phone,Email")] Supplier supplier)
         {
             if (id != supplier.SupplierId)
             {

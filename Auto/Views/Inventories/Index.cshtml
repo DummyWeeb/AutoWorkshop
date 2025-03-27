@@ -16,6 +16,12 @@
                 @Html.DisplayNameFor(model => model.Quantity)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.поступления)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.списания)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Part)
             </th>
             <th></th>
@@ -28,7 +34,13 @@
                 @Html.DisplayFor(modelItem => item.Quantity)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Part.PartId)
+                @Html.DisplayFor(modelItem => item.поступления)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.списания)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Part.Name)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.InventoryId">Edit</a> |

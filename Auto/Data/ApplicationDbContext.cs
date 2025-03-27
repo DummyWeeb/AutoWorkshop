@@ -9,14 +9,26 @@ namespace Auto.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-
         }
-        public DbSet<Brand> Brands { get; set; }
-        public DbSet<Model> Models { get; set; }
+
         public DbSet<Part> Parts { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<Brand> Brands { get; set; }
+        public DbSet<CarModel> CarModels { get; set; }
+        public DbSet<Podrazdelenie> Podrazdelenies { get; set; }   
+        public DbSet<CustomUser> CustomUsers { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Many-to-Many relationship between CarModel and Part
+            modelBuilder.Entity<CarModel>()
+                .HasMany(c => c.Parts)
+                .WithMany(p => p.CarModels)
+                .UsingEntity(j => j.ToTable("CarModelPart")); // Optional: Specify the joining table name
+        }
     }
 }

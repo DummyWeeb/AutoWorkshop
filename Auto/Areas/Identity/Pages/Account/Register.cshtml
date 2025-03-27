@@ -18,6 +18,36 @@
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
+                <input asp-for="Input.Surname" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Surname">Фамилия</label>
+                <span asp-validation-for="Input.Surname" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Ima" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Ima">Имя</label>
+                <span asp-validation-for="Input.Ima" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.SecSurName" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.SecSurName">Отчество</label>
+                <span asp-validation-for="Input.SecSurName" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Age" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Age">Возраст</label>
+                <span asp-validation-for="Input.Age" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <select asp-for="Input.PodrazdelenieId" class="form-control"
+                        asp-items="@Model.Podrazdelenies">
+                    <option value="">Выберите подразделение...</option>
+                </select>
+                <label asp-for="Input.PodrazdelenieId">Подразделение</label>
+                <span asp-validation-for="Input.PodrazdelenieId" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-floating mb-3">
                 <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
                 <label asp-for="Input.Password">Password</label>
                 <span asp-validation-for="Input.Password" class="text-danger"></span>

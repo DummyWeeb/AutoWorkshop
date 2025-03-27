@@ -22,7 +22,7 @@ namespace Auto.Controllers
         // GET: Parts
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Parts.Include(p => p.Model);
+            var applicationDbContext = _context.Parts.Include(p => p.Supplier);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -35,7 +35,7 @@ namespace Auto.Controllers
             }
 
             var part = await _context.Parts
-                .Include(p => p.Model)
+                .Include(p => p.Supplier)
                 .FirstOrDefaultAsync(m => m.PartId == id);
             if (part == null)
             {
@@ -48,7 +48,7 @@ namespace Auto.Controllers
         // GET: Parts/Create
         public IActionResult Create()
         {
-            ViewData["ModelId"] = new SelectList(_context.Models, "ModelId", "ModelId");
+            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "Name");
             return View();
         }
 
@@ -57,7 +57,7 @@ namespace Auto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PartId,Name,ModelId")] Part part)
+        public async Task<IActionResult> Create([Bind("PartId,Name,Description,Price,ImageUrl,SupplierId")] Part part)
         {
             if (ModelState.IsValid)
             {
@@ -65,7 +65,7 @@ namespace Auto.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ModelId"] = new SelectList(_context.Models, "ModelId", "ModelId", part.ModelId);
+            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "Name", part.SupplierId);
             return View(part);
         }
 
@@ -82,7 +82,7 @@ namespace Auto.Controllers
             {
                 return NotFound();
             }
-            ViewData["ModelId"] = new SelectList(_context.Models, "ModelId", "ModelId", part.ModelId);
+            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "Name", part.SupplierId);
             return View(part);
         }
 
@@ -91,7 +91,7 @@ namespace Auto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PartId,Name,ModelId")] Part part)
+        public async Task<IActionResult> Edit(int id, [Bind("PartId,Name,Description,Price,ImageUrl,SupplierId")] Part part)
         {
             if (id != part.PartId)
             {
@@ -118,7 +118,7 @@ namespace Auto.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ModelId"] = new SelectList(_context.Models, "ModelId", "ModelId", part.ModelId);
+            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "Name", part.SupplierId);
             return View(part);
         }
 
@@ -131,7 +131,7 @@ namespace Auto.Controllers
             }
 
             var part = await _context.Parts
-                .Include(p => p.Model)
+                .Include(p => p.Supplier)
                 .FirstOrDefaultAsync(m => m.PartId == id);
             if (part == null)
             {

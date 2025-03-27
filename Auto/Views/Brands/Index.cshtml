@@ -21,8 +21,9 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
+            <td> <a asp-controller="CarModels" asp-action="Index" asp-route-brandId="@item.BrandId">
                 @Html.DisplayFor(modelItem => item.Name)
+                </a>
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.BrandId">Edit</a> |

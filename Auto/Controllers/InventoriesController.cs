@@ -48,7 +48,7 @@ namespace Auto.Controllers
         // GET: Inventories/Create
         public IActionResult Create()
         {
-            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "PartId");
+            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "Name");
             return View();
         }
 
@@ -57,7 +57,7 @@ namespace Auto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("InventoryId,PartId,Quantity")] Inventory inventory)
+        public async Task<IActionResult> Create([Bind("InventoryId,Quantity,поступления,списания,PartId")] Inventory inventory)
         {
             if (ModelState.IsValid)
             {
@@ -65,7 +65,7 @@ namespace Auto.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "PartId", inventory.PartId);
+            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "Name", inventory.PartId);
             return View(inventory);
         }
 
@@ -82,7 +82,7 @@ namespace Auto.Controllers
             {
                 return NotFound();
             }
-            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "PartId", inventory.PartId);
+            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "Name", inventory.PartId);
             return View(inventory);
         }
 
@@ -91,7 +91,7 @@ namespace Auto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("InventoryId,PartId,Quantity")] Inventory inventory)
+        public async Task<IActionResult> Edit(int id, [Bind("InventoryId,Quantity,поступления,списания,PartId")] Inventory inventory)
         {
             if (id != inventory.InventoryId)
             {
@@ -118,7 +118,7 @@ namespace Auto.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "PartId", inventory.PartId);
+            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "Name", inventory.PartId);
             return View(inventory);
         }
 

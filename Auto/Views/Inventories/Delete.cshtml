@@ -18,10 +18,22 @@
             @Html.DisplayFor(model => model.Quantity)
         </dd>
         <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.поступления)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.поступления)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.списания)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.списания)
+        </dd>
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Part)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Part.PartId)
+            @Html.DisplayFor(model => model.Part.Name)
         </dd>
     </dl>
     

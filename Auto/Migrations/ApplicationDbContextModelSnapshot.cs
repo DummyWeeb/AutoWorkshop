@@ -4,19 +4,16 @@ using Auto.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Auto.Data.Migrations
+namespace Auto.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250208180355_auto1")]
-    partial class auto1
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,11 +32,38 @@ namespace Auto.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("BrandId");
 
                     b.ToTable("Brands");
+                });
+
+            modelBuilder.Entity("Auto.Models.CarModel", b =>
+                {
+                    b.Property<int>("CarModelId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CarModelId"));
+
+                    b.Property<int>("BrandId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("CarModelId");
+
+                    b.HasIndex("BrandId");
+
+                    b.ToTable("CarModels");
                 });
 
             modelBuilder.Entity("Auto.Models.Inventory", b =>
@@ -56,33 +80,17 @@ namespace Auto.Data.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("поступления")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("списания")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("InventoryId");
 
                     b.HasIndex("PartId");
 
                     b.ToTable("Inventories");
-                });
-
-            modelBuilder.Entity("Auto.Models.Model", b =>
-                {
-                    b.Property<int>("ModelId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModelId"));
-
-                    b.Property<int>("BrandId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ModelId");
-
-                    b.HasIndex("BrandId");
-
-                    b.ToTable("Models");
                 });
 
             modelBuilder.Entity("Auto.Models.Order", b =>
@@ -96,12 +104,13 @@ namespace Auto.Data.Migrations
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("SupplierId")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("OrderId");
-
-                    b.HasIndex("SupplierId");
 
                     b.ToTable("Orders");
                 });
@@ -119,6 +128,9 @@ namespace Auto.Data.Migrations
 
                     b.Property<int>("PartId")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("PricePerUnit")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -140,23 +152,44 @@ namespace Auto.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PartId"));
 
-                    b.Property<int>("ModelId")
-                        .HasColumnType("int");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("SupplierId")
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SupplierId")
                         .HasColumnType("int");
 
                     b.HasKey("PartId");
 
-                    b.HasIndex("ModelId");
-
                     b.HasIndex("SupplierId");
 
                     b.ToTable("Parts");
+                });
+
+            modelBuilder.Entity("Auto.Models.Podrazdelenie", b =>
+                {
+                    b.Property<int>("PodrazdelenieId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PodrazdelenieId"));
+
+                    b.Property<string>("PodrazdelenieName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PodrazdelenieId");
+
+                    b.ToTable("Podrazdelenies");
                 });
 
             modelBuilder.Entity("Auto.Models.Supplier", b =>
@@ -167,17 +200,40 @@ namespace Auto.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SupplierId"));
 
-                    b.Property<string>("ContactInfo")
-                        .IsRequired()
+                    b.Property<string>("Address")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("SupplierId");
 
                     b.ToTable("Suppliers");
+                });
+
+            modelBuilder.Entity("CarModelPart", b =>
+                {
+                    b.Property<int>("CarModelsCarModelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PartsPartId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CarModelsCarModelId", "PartsPartId");
+
+                    b.HasIndex("PartsPartId");
+
+                    b.ToTable("CarModelPart", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -244,6 +300,11 @@ namespace Auto.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -295,6 +356,10 @@ namespace Auto.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasDiscriminator().HasValue("IdentityUser");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -382,18 +447,31 @@ namespace Auto.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Auto.Models.Inventory", b =>
+            modelBuilder.Entity("Auto.Models.CustomUser", b =>
                 {
-                    b.HasOne("Auto.Models.Part", "Part")
-                        .WithMany()
-                        .HasForeignKey("PartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
-                    b.Navigation("Part");
+                    b.Property<int>("Age")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Ima")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PodrazdelenieId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SecSurname")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Surname")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasIndex("PodrazdelenieId");
+
+                    b.HasDiscriminator().HasValue("CustomUser");
                 });
 
-            modelBuilder.Entity("Auto.Models.Model", b =>
+            modelBuilder.Entity("Auto.Models.CarModel", b =>
                 {
                     b.HasOne("Auto.Models.Brand", "Brand")
                         .WithMany("Models")
@@ -404,15 +482,15 @@ namespace Auto.Data.Migrations
                     b.Navigation("Brand");
                 });
 
-            modelBuilder.Entity("Auto.Models.Order", b =>
+            modelBuilder.Entity("Auto.Models.Inventory", b =>
                 {
-                    b.HasOne("Auto.Models.Supplier", "Supplier")
-                        .WithMany()
-                        .HasForeignKey("SupplierId")
+                    b.HasOne("Auto.Models.Part", "Part")
+                        .WithMany("Inventories")
+                        .HasForeignKey("PartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Supplier");
+                    b.Navigation("Part");
                 });
 
             modelBuilder.Entity("Auto.Models.OrderDetail", b =>
@@ -424,7 +502,7 @@ namespace Auto.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("Auto.Models.Part", "Part")
-                        .WithMany()
+                        .WithMany("OrderDetails")
                         .HasForeignKey("PartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -436,17 +514,28 @@ namespace Auto.Data.Migrations
 
             modelBuilder.Entity("Auto.Models.Part", b =>
                 {
-                    b.HasOne("Auto.Models.Model", "Model")
+                    b.HasOne("Auto.Models.Supplier", "Supplier")
                         .WithMany("Parts")
-                        .HasForeignKey("ModelId")
+                        .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Auto.Models.Supplier", null)
-                        .WithMany("Parts")
-                        .HasForeignKey("SupplierId");
+                    b.Navigation("Supplier");
+                });
 
-                    b.Navigation("Model");
+            modelBuilder.Entity("CarModelPart", b =>
+                {
+                    b.HasOne("Auto.Models.CarModel", null)
+                        .WithMany()
+                        .HasForeignKey("CarModelsCarModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Auto.Models.Part", null)
+                        .WithMany()
+                        .HasForeignKey("PartsPartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -500,19 +589,37 @@ namespace Auto.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Auto.Models.CustomUser", b =>
+                {
+                    b.HasOne("Auto.Models.Podrazdelenie", "Podrazdelenie")
+                        .WithMany("CustomUser")
+                        .HasForeignKey("PodrazdelenieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Podrazdelenie");
+                });
+
             modelBuilder.Entity("Auto.Models.Brand", b =>
                 {
                     b.Navigation("Models");
                 });
 
-            modelBuilder.Entity("Auto.Models.Model", b =>
-                {
-                    b.Navigation("Parts");
-                });
-
             modelBuilder.Entity("Auto.Models.Order", b =>
                 {
                     b.Navigation("OrderDetails");
+                });
+
+            modelBuilder.Entity("Auto.Models.Part", b =>
+                {
+                    b.Navigation("Inventories");
+
+                    b.Navigation("OrderDetails");
+                });
+
+            modelBuilder.Entity("Auto.Models.Podrazdelenie", b =>
+                {
+                    b.Navigation("CustomUser");
                 });
 
             modelBuilder.Entity("Auto.Models.Supplier", b =>

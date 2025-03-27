@@ -22,8 +22,7 @@ namespace Auto.Controllers
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Orders.Include(o => o.Supplier);
-            return View(await applicationDbContext.ToListAsync());
+            return View(await _context.Orders.ToListAsync());
         }
 
         // GET: Orders/Details/5
@@ -35,7 +34,6 @@ namespace Auto.Controllers
             }
 
             var order = await _context.Orders
-                .Include(o => o.Supplier)
                 .FirstOrDefaultAsync(m => m.OrderId == id);
             if (order == null)
             {
@@ -48,7 +46,6 @@ namespace Auto.Controllers
         // GET: Orders/Create
         public IActionResult Create()
         {
-            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "SupplierId");
             return View();
         }
 
@@ -57,7 +54,7 @@ namespace Auto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderId,SupplierId,OrderDate")] Order order)
+        public async Task<IActionResult> Create([Bind("OrderId,OrderDate,TotalAmount,Status")] Order order)
         {
             if (ModelState.IsValid)
             {
@@ -65,7 +62,6 @@ namespace Auto.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "SupplierId", order.SupplierId);
             return View(order);
         }
 
@@ -82,7 +78,6 @@ namespace Auto.Controllers
             {
                 return NotFound();
             }
-            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "SupplierId", order.SupplierId);
             return View(order);
         }
 
@@ -91,7 +86,7 @@ namespace Auto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("OrderId,SupplierId,OrderDate")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("OrderId,OrderDate,TotalAmount,Status")] Order order)
         {
             if (id != order.OrderId)
             {
@@ -118,7 +113,6 @@ namespace Auto.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "SupplierId", order.SupplierId);
             return View(order);
         }
 
@@ -131,7 +125,6 @@ namespace Auto.Controllers
             }
 
             var order = await _context.Orders
-                .Include(o => o.Supplier)
                 .FirstOrDefaultAsync(m => m.OrderId == id);
             if (order == null)
             {

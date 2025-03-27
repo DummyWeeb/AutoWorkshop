@@ -50,7 +50,7 @@ namespace Auto.Controllers
         public IActionResult Create()
         {
             ViewData["OrderId"] = new SelectList(_context.Orders, "OrderId", "OrderId");
-            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "PartId");
+            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "Name");
             return View();
         }
 
@@ -59,7 +59,7 @@ namespace Auto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderDetailId,OrderId,PartId,Quantity")] OrderDetail orderDetail)
+        public async Task<IActionResult> Create([Bind("OrderDetailId,Quantity,PricePerUnit,OrderId,PartId")] OrderDetail orderDetail)
         {
             if (ModelState.IsValid)
             {
@@ -68,7 +68,7 @@ namespace Auto.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["OrderId"] = new SelectList(_context.Orders, "OrderId", "OrderId", orderDetail.OrderId);
-            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "PartId", orderDetail.PartId);
+            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "Name", orderDetail.PartId);
             return View(orderDetail);
         }
 
@@ -86,7 +86,7 @@ namespace Auto.Controllers
                 return NotFound();
             }
             ViewData["OrderId"] = new SelectList(_context.Orders, "OrderId", "OrderId", orderDetail.OrderId);
-            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "PartId", orderDetail.PartId);
+            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "Name", orderDetail.PartId);
             return View(orderDetail);
         }
 
@@ -95,7 +95,7 @@ namespace Auto.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("OrderDetailId,OrderId,PartId,Quantity")] OrderDetail orderDetail)
+        public async Task<IActionResult> Edit(int id, [Bind("OrderDetailId,Quantity,PricePerUnit,OrderId,PartId")] OrderDetail orderDetail)
         {
             if (id != orderDetail.OrderDetailId)
             {
@@ -123,7 +123,7 @@ namespace Auto.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["OrderId"] = new SelectList(_context.Orders, "OrderId", "OrderId", orderDetail.OrderId);
-            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "PartId", orderDetail.PartId);
+            ViewData["PartId"] = new SelectList(_context.Parts, "PartId", "Name", orderDetail.PartId);
             return View(orderDetail);
         }
 

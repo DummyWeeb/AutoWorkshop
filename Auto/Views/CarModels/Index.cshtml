@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Auto.Models.Model>
+﻿@model IEnumerable<Auto.Models.CarModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -16,6 +16,9 @@
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.Year)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Brand)
             </th>
             <th></th>
@@ -28,12 +31,15 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Brand.BrandId)
+                @Html.DisplayFor(modelItem => item.Year)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ModelId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ModelId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ModelId">Delete</a>
+                @Html.DisplayFor(modelItem => item.Brand.Name)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.CarModelId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.CarModelId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.CarModelId">Delete</a>
             </td>
         </tr>
 }
