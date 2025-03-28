@@ -7,7 +7,7 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" asp-route-brandId="@ViewBag.BrandId">Create New</a>
 </p>
 <table class="table">
     <thead>
@@ -19,29 +19,39 @@
                 @Html.DisplayNameFor(model => model.Year)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Brand)
+                @Html.DisplayNameFor(model => model.Brand.Name)
+            </th>
+            <th>
+                Логотип
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Year)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Brand.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.CarModelId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.CarModelId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CarModelId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Year)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Brand.Name)
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.LogoPath))
+                    {
+                        <img src="@item.LogoPath" alt="Логотип" width="100" />
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.CarModelId" asp-route-brandId="@ViewBag.BrandId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.CarModelId" asp-route-brandId="@ViewBag.BrandId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.CarModelId" asp-route-brandId="@ViewBag.BrandId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

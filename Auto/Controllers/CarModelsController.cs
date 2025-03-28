@@ -7,16 +7,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Auto.Data;
 using Auto.Models;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace Auto.Controllers
 {
     public class CarModelsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public CarModelsController(ApplicationDbContext context)
+        public CarModelsController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
+            _hostEnvironment = hostEnvironment;
         }
 
         // GET: CarModels
@@ -35,13 +39,14 @@ namespace Auto.Controllers
                     .Where(m => m.BrandId == brandId)
                     .Include(c => c.Brand)
                     .ToListAsync();
+                ViewBag.BrandId = brandId;
                 ViewBag.BrandName = _context.Brands.FirstOrDefault(b => b.BrandId == brandId)?.Name;
                 return View(modelsForBrand);
             }
         }
 
         // GET: CarModels/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, int? brandId)
         {
             if (id == null)
             {
@@ -56,35 +61,47 @@ namespace Auto.Controllers
                 return NotFound();
             }
 
+            ViewBag.BrandId = brandId;
             return View(carModel);
         }
 
         // GET: CarModels/Create
-        public IActionResult Create()
+        public IActionResult Create(int? brandId)
         {
-            ViewData["BrandId"] = new SelectList(_context.Brands, "BrandId", "Name");
+            ViewBag.BrandId = brandId;
+            ViewData["BrandId"] = new SelectList(_context.Brands, "BrandId", "Name", brandId);
             return View();
         }
 
         // POST: CarModels/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CarModelId,Name,Year,BrandId")] CarModel carModel)
+        public async Task<IActionResult> Create([Bind("CarModelId,Name,Year,BrandId,LogoPath")] CarModel carModel, IFormFile logoFile)
         {
             if (ModelState.IsValid)
             {
+                if (logoFile != null)
+                {
+                    string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "carmodels");
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + logoFile.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await logoFile.CopyToAsync(fileStream);
+                    }
+                    carModel.LogoPath = "/images/carmodels/" + uniqueFileName;
+                }
+
                 _context.Add(carModel);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { brandId = carModel.BrandId });
             }
             ViewData["BrandId"] = new SelectList(_context.Brands, "BrandId", "Name", carModel.BrandId);
             return View(carModel);
         }
 
         // GET: CarModels/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int? id, int? brandId)
         {
             if (id == null)
             {
@@ -96,16 +113,15 @@ namespace Auto.Controllers
             {
                 return NotFound();
             }
-            ViewData["BrandId"] = new SelectList(_context.Brands, "BrandId", "Name", carModel.BrandId);
+            ViewBag.BrandId = brandId;
+            ViewData["BrandList"] = new SelectList(_context.Brands, "BrandId", "Name", carModel.BrandId);
             return View(carModel);
         }
 
         // POST: CarModels/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CarModelId,Name,Year,BrandId")] CarModel carModel)
+        public async Task<IActionResult> Edit(int id, [Bind("CarModelId,Name,Year,BrandId,LogoPath")] CarModel carModel, IFormFile logoFile)
         {
             if (id != carModel.CarModelId)
             {
@@ -116,6 +132,18 @@ namespace Auto.Controllers
             {
                 try
                 {
+                    if (logoFile != null)
+                    {
+                        string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "carmodels");
+                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + logoFile.FileName;
+                        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await logoFile.CopyToAsync(fileStream);
+                        }
+                        carModel.LogoPath = "/images/carmodels/" + uniqueFileName;
+                    }
+
                     _context.Update(carModel);
                     await _context.SaveChangesAsync();
                 }
@@ -130,14 +158,14 @@ namespace Auto.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { brandId = carModel.BrandId });
             }
             ViewData["BrandId"] = new SelectList(_context.Brands, "BrandId", "Name", carModel.BrandId);
             return View(carModel);
         }
 
         // GET: CarModels/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, int? brandId)
         {
             if (id == null)
             {
@@ -152,13 +180,14 @@ namespace Auto.Controllers
                 return NotFound();
             }
 
+            ViewBag.BrandId = brandId;
             return View(carModel);
         }
 
         // POST: CarModels/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id, int? brandId)
         {
             var carModel = await _context.CarModels.FindAsync(id);
             if (carModel != null)
@@ -167,7 +196,7 @@ namespace Auto.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { brandId = brandId });
         }
 
         private bool CarModelExists(int id)
