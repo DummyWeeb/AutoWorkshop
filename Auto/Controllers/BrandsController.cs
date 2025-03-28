@@ -7,16 +7,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Auto.Data;
 using Auto.Models;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace Auto.Controllers
 {
     public class BrandsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public BrandsController(ApplicationDbContext context)
+        public BrandsController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
+            _hostEnvironment = hostEnvironment;
         }
 
         // GET: Brands
@@ -50,14 +54,24 @@ namespace Auto.Controllers
         }
 
         // POST: Brands/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BrandId,Name")] Brand brand)
+        public async Task<IActionResult> Create([Bind("BrandId,Name,LogoPath")] Brand brand, IFormFile logoFile)
         {
             if (ModelState.IsValid)
             {
+                if (logoFile != null)
+                {
+                    string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "brands");
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + logoFile.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await logoFile.CopyToAsync(fileStream);
+                    }
+                    brand.LogoPath = "/images/brands/" + uniqueFileName;
+                }
+
                 _context.Add(brand);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -82,11 +96,9 @@ namespace Auto.Controllers
         }
 
         // POST: Brands/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BrandId,Name")] Brand brand)
+        public async Task<IActionResult> Edit(int id, [Bind("BrandId,Name,LogoPath")] Brand brand, IFormFile logoFile)
         {
             if (id != brand.BrandId)
             {
@@ -97,6 +109,18 @@ namespace Auto.Controllers
             {
                 try
                 {
+                    if (logoFile != null)
+                    {
+                        string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "brands");
+                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + logoFile.FileName;
+                        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await logoFile.CopyToAsync(fileStream);
+                        }
+                        brand.LogoPath = "/images/brands/" + uniqueFileName;
+                    }
+
                     _context.Update(brand);
                     await _context.SaveChangesAsync();
                 }

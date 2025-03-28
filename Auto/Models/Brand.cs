@@ -12,7 +12,10 @@ namespace Auto.Models
         [Required(ErrorMessage = "Название марки обязательно.")]
         [StringLength(255, ErrorMessage = "Название не должно превышать 255 символов.")]
         [Display(Name = "Название марки")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
+
+        [Display(Name = "Логотип")]
+        public string? LogoPath { get; set; } // Путь к логотипу
 
         public virtual ICollection<CarModel>? Models { get; set; } // Список моделей
     }

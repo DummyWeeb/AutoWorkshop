@@ -15,22 +15,33 @@
             <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
+            <th>
+                Логотип
+            </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td> <a asp-controller="CarModels" asp-action="Index" asp-route-brandId="@item.BrandId">
-                @Html.DisplayFor(modelItem => item.Name)
-                </a>
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.BrandId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.BrandId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.BrandId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-controller="CarModels" asp-action="Index" asp-route-brandId="@item.BrandId">
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </a>
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.LogoPath))
+                    {
+                        <img src="@item.LogoPath" alt="Логотип" width="100" />
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.BrandId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.BrandId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.BrandId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
