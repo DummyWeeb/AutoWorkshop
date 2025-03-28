@@ -22,9 +22,6 @@ namespace Auto.Models
         [Display(Name = "Цена")]
         public decimal Price { get; set; }
 
-        [Display(Name = "Изображение")]
-        public string? ImageUrl { get; set; } // URL изображения запчасти
-
         // Связи
         public int SupplierId { get; set; } // Внешний ключ к поставщику
         public Supplier? Supplier { get; set; } // Навигационное свойство для поставщика
