@@ -65,39 +65,33 @@ namespace Auto.Controllers
             return View(carModel);
         }
 
+
+
         // GET: CarModels/Create
-        public IActionResult Create(int? brandId)
+        public IActionResult Create(int carModelId)
         {
-            ViewBag.BrandId = brandId;
-            ViewData["BrandId"] = new SelectList(_context.Brands, "BrandId", "Name", brandId);
+            ViewBag.CarModelId = carModelId;
             return View();
         }
 
         // POST: CarModels/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CarModelId,Name,Year,BrandId,LogoPath")] CarModel carModel, IFormFile logoFile)
+        public async Task<IActionResult> Create([Bind("PartId,Name,Description,Quantity")] Part part, int carModelId)
         {
             if (ModelState.IsValid)
             {
-                if (logoFile != null)
+                var carModel = await _context.CarModels.FindAsync(carModelId);
+                if (carModel != null)
                 {
-                    string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "carmodels");
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + logoFile.FileName;
-                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await logoFile.CopyToAsync(fileStream);
-                    }
-                    carModel.LogoPath = "/images/carmodels/" + uniqueFileName;
+                    part.CarModels = new List<CarModel> { carModel };
                 }
-
-                _context.Add(carModel);
+                _context.Add(part);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index), new { brandId = carModel.BrandId });
+                return RedirectToAction(nameof(Index), new { carModelId = carModelId });
             }
-            ViewData["BrandId"] = new SelectList(_context.Brands, "BrandId", "Name", carModel.BrandId);
-            return View(carModel);
+            ViewBag.CarModelId = carModelId;
+            return View(part);
         }
 
         // GET: CarModels/Edit/5

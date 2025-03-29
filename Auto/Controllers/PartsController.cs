@@ -20,10 +20,20 @@ namespace Auto.Controllers
         }
 
         // GET: Parts
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? carModelId)
         {
-            var applicationDbContext = _context.Parts.Include(p => p.Supplier);
-            return View(await applicationDbContext.ToListAsync());
+            if (carModelId == null)
+            {
+                return View(await _context.Parts.ToListAsync());
+            }
+            else
+            {
+                var partsForCarModel = await _context.Parts
+                    .Where(p => p.CarModels.Any(cm => cm.CarModelId == carModelId))
+                    .ToListAsync();
+                ViewBag.CarModelId = carModelId;
+                return View(partsForCarModel);
+            }
         }
 
         // GET: Parts/Details/5
@@ -35,7 +45,6 @@ namespace Auto.Controllers
             }
 
             var part = await _context.Parts
-                .Include(p => p.Supplier)
                 .FirstOrDefaultAsync(m => m.PartId == id);
             if (part == null)
             {
@@ -46,26 +55,30 @@ namespace Auto.Controllers
         }
 
         // GET: Parts/Create
-        public IActionResult Create()
+        public IActionResult Create(int carModelId)
         {
-            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "Name");
+            ViewBag.CarModelId = carModelId;
+            ViewBag.CarModels = _context.CarModels.ToList();
             return View();
         }
 
         // POST: Parts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PartId,Name,Description,Price,SupplierId")] Part part)
+        public async Task<IActionResult> Create([Bind("PartId,Name,Description,Quantity")] Part part, int carModelId)
         {
             if (ModelState.IsValid)
             {
+                var carModel = await _context.CarModels.FindAsync(carModelId);
+                if (carModel != null)
+                {
+                    part.CarModels = new List<CarModel> { carModel };
+                }
                 _context.Add(part);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "Name", part.SupplierId);
+            ViewBag.CarModelId = carModelId;
             return View(part);
         }
 
@@ -82,16 +95,14 @@ namespace Auto.Controllers
             {
                 return NotFound();
             }
-            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "Name", part.SupplierId);
+            ViewBag.CarModels = _context.CarModels.ToList();
             return View(part);
         }
 
         // POST: Parts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PartId,Name,Description,Price,SupplierId")] Part part)
+        public async Task<IActionResult> Edit(int id, [Bind("PartId,Name,Description,Quantity,CarModelId")] Part part)
         {
             if (id != part.PartId)
             {
@@ -118,7 +129,7 @@ namespace Auto.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "Name", part.SupplierId);
+            ViewBag.CarModels = _context.CarModels.ToList();
             return View(part);
         }
 
@@ -131,7 +142,6 @@ namespace Auto.Controllers
             }
 
             var part = await _context.Parts
-                .Include(p => p.Supplier)
                 .FirstOrDefaultAsync(m => m.PartId == id);
             if (part == null)
             {

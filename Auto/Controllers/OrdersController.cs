@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +21,14 @@ namespace Auto.Controllers
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Orders.ToListAsync());
+            var orders = await _context.Orders
+                .Include(o => o.Supplier)
+                .Include(o => o.OrderParts)
+                    .ThenInclude(op => op.Part)
+                .Include(o => o.OrderParts)
+                    .ThenInclude(op => op.CarModel)
+                .ToListAsync();
+            return View(orders);
         }
 
         // GET: Orders/Details/5
@@ -34,6 +40,11 @@ namespace Auto.Controllers
             }
 
             var order = await _context.Orders
+                .Include(o => o.Supplier)
+                .Include(o => o.OrderParts)
+                    .ThenInclude(op => op.Part)
+                .Include(o => o.OrderParts)
+                    .ThenInclude(op => op.CarModel)
                 .FirstOrDefaultAsync(m => m.OrderId == id);
             if (order == null)
             {
@@ -46,15 +57,16 @@ namespace Auto.Controllers
         // GET: Orders/Create
         public IActionResult Create()
         {
+            ViewBag.Parts = _context.Parts.ToList();
+            ViewBag.Suppliers = _context.Suppliers.ToList();
+            ViewBag.CarModels = _context.CarModels.ToList();
             return View();
         }
 
         // POST: Orders/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderId,OrderDate,TotalAmount,Status")] Order order)
+        public async Task<IActionResult> Create([Bind("OrderId,OrderDate,TotalAmount,Status,PricePerUnit,SupplierId,SupplierName,OrderParts")] Order order)
         {
             if (ModelState.IsValid)
             {
@@ -62,6 +74,9 @@ namespace Auto.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.Parts = _context.Parts.ToList();
+            ViewBag.Suppliers = _context.Suppliers.ToList();
+            ViewBag.CarModels = _context.CarModels.ToList();
             return View(order);
         }
 
@@ -73,20 +88,22 @@ namespace Auto.Controllers
                 return NotFound();
             }
 
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders
+                .Include(o => o.OrderParts)
+                .FirstOrDefaultAsync(m => m.OrderId == id);
             if (order == null)
             {
                 return NotFound();
             }
+            ViewBag.Parts = _context.Parts.ToList();
+            ViewBag.Suppliers = _context.Suppliers.ToList();
             return View(order);
         }
 
         // POST: Orders/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("OrderId,OrderDate,TotalAmount,Status")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("OrderId,OrderDate,TotalAmount,Status,PricePerUnit,SupplierId,SupplierName,OrderParts")] Order order)
         {
             if (id != order.OrderId)
             {
@@ -113,6 +130,8 @@ namespace Auto.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.Parts = _context.Parts.ToList();
+            ViewBag.Suppliers = _context.Suppliers.ToList();
             return View(order);
         }
 
@@ -125,6 +144,11 @@ namespace Auto.Controllers
             }
 
             var order = await _context.Orders
+                .Include(o => o.Supplier)
+                .Include(o => o.OrderParts)
+                    .ThenInclude(op => op.Part)
+                .Include(o => o.OrderParts)
+                    .ThenInclude(op => op.CarModel)
                 .FirstOrDefaultAsync(m => m.OrderId == id);
             if (order == null)
             {
@@ -139,13 +163,43 @@ namespace Auto.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders
+                .Include(o => o.OrderParts)
+                .FirstOrDefaultAsync(m => m.OrderId == id);
             if (order != null)
             {
                 _context.Orders.Remove(order);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public IActionResult MarkAsArrived(int orderId)
+        {
+            var order = _context.Orders
+                .Include(o => o.OrderParts)
+                .ThenInclude(op => op.Part)
+                .FirstOrDefault(o => o.OrderId == orderId);
+
+            if (order == null)
+            {
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
+            order.Status = OrderStatus.ЗаказВыполнен;
+            _context.SaveChanges();
+
+            foreach (var orderPart in order.OrderParts)
+            {
+                var part = _context.Parts.Find(orderPart.PartId);
+                if (part != null)
+                {
+                    part.Quantity += orderPart.Quantity;
+                    _context.SaveChanges();
+                }
+            }
+
             return RedirectToAction(nameof(Index));
         }
 

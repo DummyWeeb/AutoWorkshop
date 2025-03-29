@@ -15,10 +15,9 @@ namespace Auto.Data
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<Brand> Brands { get; set; }
         public DbSet<CarModel> CarModels { get; set; }
-        public DbSet<Podrazdelenie> Podrazdelenies { get; set; }   
+        public DbSet<Podrazdelenie> Podrazdelenies { get; set; }
         public DbSet<CustomUser> CustomUsers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

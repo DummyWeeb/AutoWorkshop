@@ -1,7 +1,7 @@
 ﻿using System;
-using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Xml.Linq;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Auto.Models
 {
@@ -17,16 +17,12 @@ namespace Auto.Models
         [Display(Name = "Описание")]
         public string? Description { get; set; } // Опциональное описание
 
-        [Required(ErrorMessage = "Цена обязательна.")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Цена должна быть больше 0.01.")]
-        [Display(Name = "Цена")]
-        public decimal Price { get; set; }
+        [Required(ErrorMessage = "Количество обязательно.")]
+        [Range(0, int.MaxValue, ErrorMessage = "Количество должно быть неотрицательным.")]
+        [Display(Name = "Количество")]
+        public int Quantity { get; set; }
 
         // Связи
-        public int SupplierId { get; set; } // Внешний ключ к поставщику
-        public Supplier? Supplier { get; set; } // Навигационное свойство для поставщика
-        public virtual ICollection<CarModel>? CarModels { get; set; }
-        public virtual ICollection<Inventory>? Inventories { get; set; } // Связь с запасами
-        public virtual ICollection<OrderDetail>? OrderDetails { get; set; } // Связь с деталями заказа
+        public virtual ICollection<CarModel>? CarModels { get; set; } // Добавлена коллекция CarModels
     }
 }

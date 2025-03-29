@@ -49,7 +49,8 @@
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.CarModelId" asp-route-brandId="@ViewBag.BrandId">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.CarModelId" asp-route-brandId="@ViewBag.BrandId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.CarModelId" asp-route-brandId="@ViewBag.BrandId">Delete</a>
+                    <a asp-action="Delete" asp-route-id="@item.CarModelId" asp-route-brandId="@ViewBag.BrandId">Delete</a> |
+                    <a asp-action="Index" asp-controller="Parts" asp-route-carModelId="@item.CarModelId">Запчасти</a>
                 </td>
             </tr>
         }

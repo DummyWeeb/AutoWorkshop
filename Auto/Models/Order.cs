@@ -1,7 +1,7 @@
 ﻿using System;
-using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Xml.Linq;
+using Auto.Data;
 
 namespace Auto.Models
 {
@@ -15,12 +15,21 @@ namespace Auto.Models
         public DateTime OrderDate { get; set; }
 
         [Display(Name = "Общая сумма")]
-        public decimal TotalAmount { get; set; } // Вычисляемое поле
+        public decimal TotalAmount { get; set; }
 
         [Display(Name = "Статус")]
-        public string? Status { get; set; }
+        public OrderStatus Status { get; set; } = OrderStatus.Заказано;
+
+        [Display(Name = "Цена за единицу")]
+        public decimal PricePerUnit { get; set; }
 
         // Связи
-        public virtual ICollection<OrderDetail>? OrderDetails { get; set; } // Связь с деталями заказа
+        public int SupplierId { get; set; }
+        public Supplier? Supplier { get; set; }
+
+        [Display(Name = "Название поставщика")]
+        public string? SupplierName { get; set; }
+
+        public virtual ICollection<OrderPart>? OrderParts { get; set; }
     }
 }
