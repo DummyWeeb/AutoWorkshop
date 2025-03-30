@@ -65,18 +65,20 @@ namespace Auto.Controllers
         // POST: Parts/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PartId,Name,Description,Quantity")] Part part, int carModelId)
+        public async Task<IActionResult> Create([Bind("PartId,Name,Description")] Part part, int carModelId)
         {
             if (ModelState.IsValid)
             {
                 var carModel = await _context.CarModels.FindAsync(carModelId);
                 if (carModel != null)
                 {
+                    part.Name = $"{part.Name} для {carModel.Name}";
                     part.CarModels = new List<CarModel> { carModel };
                 }
+                part.Quantity = 0; // Устанавливаем количество в 0
                 _context.Add(part);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { carModelId = carModelId });
             }
             ViewBag.CarModelId = carModelId;
             return View(part);

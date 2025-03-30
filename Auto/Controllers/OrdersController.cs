@@ -25,8 +25,6 @@ namespace Auto.Controllers
                 .Include(o => o.Supplier)
                 .Include(o => o.OrderParts)
                     .ThenInclude(op => op.Part)
-                .Include(o => o.OrderParts)
-                    .ThenInclude(op => op.CarModel)
                 .ToListAsync();
             return View(orders);
         }
@@ -43,8 +41,6 @@ namespace Auto.Controllers
                 .Include(o => o.Supplier)
                 .Include(o => o.OrderParts)
                     .ThenInclude(op => op.Part)
-                .Include(o => o.OrderParts)
-                    .ThenInclude(op => op.CarModel)
                 .FirstOrDefaultAsync(m => m.OrderId == id);
             if (order == null)
             {
@@ -59,24 +55,23 @@ namespace Auto.Controllers
         {
             ViewBag.Parts = _context.Parts.ToList();
             ViewBag.Suppliers = _context.Suppliers.ToList();
-            ViewBag.CarModels = _context.CarModels.ToList();
             return View();
         }
 
         // POST: Orders/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderId,OrderDate,TotalAmount,Status,PricePerUnit,SupplierId,SupplierName,OrderParts")] Order order)
+        public async Task<IActionResult> Create([Bind("OrderId,OrderDate,TotalAmount,PricePerUnit,SupplierId,SupplierName,OrderParts")] Order order)
         {
             if (ModelState.IsValid)
             {
+                order.Status = OrderStatus.Заказано; // Устанавливаем статус по умолчанию
                 _context.Add(order);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Parts = _context.Parts.ToList();
             ViewBag.Suppliers = _context.Suppliers.ToList();
-            ViewBag.CarModels = _context.CarModels.ToList();
             return View(order);
         }
 
@@ -147,8 +142,6 @@ namespace Auto.Controllers
                 .Include(o => o.Supplier)
                 .Include(o => o.OrderParts)
                     .ThenInclude(op => op.Part)
-                .Include(o => o.OrderParts)
-                    .ThenInclude(op => op.CarModel)
                 .FirstOrDefaultAsync(m => m.OrderId == id);
             if (order == null)
             {
