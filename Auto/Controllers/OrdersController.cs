@@ -190,6 +190,17 @@ namespace Auto.Controllers
                 {
                     part.Quantity += orderPart.Quantity;
                     _context.SaveChanges();
+
+                    // Обновление инвентаря
+                    var inventory = new Inventory
+                    {
+                        PartId = part.PartId,
+                        Quantity = orderPart.Quantity,
+                        поступления = DateTime.Now,
+                        Part = part
+                    };
+                    _context.Inventories.Add(inventory);
+                    _context.SaveChanges();
                 }
             }
 

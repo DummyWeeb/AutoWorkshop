@@ -1,0 +1,113 @@
+﻿@model Auto.Models.Part
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Акт об использовании запчасти</title>
+    <style>
+        body {
+            font-family: "Times New Roman", serif;
+            margin: 0;
+            padding: 15mm;
+            width: 210mm;
+            height: 297mm;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 16pt;
+            text-decoration: underline;
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .content {
+            font-size: 12pt;
+            line-height: 1.5;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+        }
+
+        .signature {
+            width: 45%;
+            text-align: center;
+        }
+
+        .signature-line {
+            border-top: 1px solid black;
+            width: 80%;
+            margin: 0 auto;
+            padding-top: 15px;
+        }
+
+        .print-button {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            padding: 10px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        @@media print {
+            .print-button {
+                display: none;
+            }
+
+            body {
+                padding: 0;
+                margin: 0;
+                width: auto;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button" onclick="window.print()">Печать</button>
+
+    <div class="header">
+        <div><strong>ООО "АвтоСервис"</strong></div>
+        <div>г. Москва, ул. Автозаводская, 10</div>
+    </div>
+
+    <div class="title">АКТ об использовании запчасти</div>
+
+    <div class="content">
+        <p>Настоящий акт подтверждает, что запчасть:</p>
+        <p><strong>Наименование:</strong> @Model.Name</p>
+        <p><strong>Количество:</strong> 1</p>
+        <p><strong>Дата составления:</strong> @DateTime.Now.ToString("dd.MM.yyyy")</p>
+
+        <p>Запчасть использована по назначению при выполнении ремонтных работ.</p>
+    </div>
+
+    <div class="signatures">
+        <div class="signature">
+            <p>Механик:</p>
+            <div class="signature-line"></div>
+            <p>_________________________/Иванов И.И./</p>
+        </div>
+        <div class="signature">
+            <p>Директор:</p>
+            <div class="signature-line"></div>
+            <p>_________________________/Петров П.П./</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -65,7 +65,7 @@ namespace Auto.Controllers
         // POST: Parts/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PartId,Name,Description")] Part part, int carModelId)
+        public async Task<IActionResult> Create([Bind("PartId,Name")] Part part, int carModelId)
         {
             if (ModelState.IsValid)
             {
@@ -78,6 +78,18 @@ namespace Auto.Controllers
                 part.Quantity = 0; // Устанавливаем количество в 0
                 _context.Add(part);
                 await _context.SaveChangesAsync();
+
+                // Обновление инвентаря
+                var inventory = new Inventory
+                {
+                    PartId = part.PartId,
+                    Quantity = part.Quantity,
+                    поступления = DateTime.Now,
+                    Part = part
+                };
+                _context.Inventories.Add(inventory);
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index), new { carModelId = carModelId });
             }
             ViewBag.CarModelId = carModelId;
@@ -104,7 +116,7 @@ namespace Auto.Controllers
         // POST: Parts/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PartId,Name,Description,Quantity,CarModelId")] Part part)
+        public async Task<IActionResult> Edit(int id, [Bind("PartId,Name,Quantity,CarModelId")] Part part)
         {
             if (id != part.PartId)
             {
@@ -116,6 +128,17 @@ namespace Auto.Controllers
                 try
                 {
                     _context.Update(part);
+                    await _context.SaveChangesAsync();
+
+                    // Обновление инвентаря
+                    var inventory = new Inventory
+                    {
+                        PartId = part.PartId,
+                        Quantity = part.Quantity,
+                        поступления = DateTime.Now,
+                        Part = part
+                    };
+                    _context.Inventories.Add(inventory);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -162,10 +185,59 @@ namespace Auto.Controllers
             if (part != null)
             {
                 _context.Parts.Remove(part);
+                await _context.SaveChangesAsync();
+
+                // Обновление инвентаря
+                var inventory = new Inventory
+                {
+                    PartId = part.PartId,
+                    Quantity = part.Quantity,
+                    списания = DateTime.Now,
+                    Part = part
+                };
+                _context.Inventories.Add(inventory);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        // POST: Parts/UsePart
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UsePart(int id)
+        {
+            var part = await _context.Parts.FindAsync(id);
+            if (part != null && part.Quantity > 0)
+            {
+                part.Quantity--;
+                await _context.SaveChangesAsync();
+
+                // Обновление инвентаря
+                var inventory = new Inventory
+                {
+                    PartId = part.PartId,
+                    Quantity = -1,
+                    списания = DateTime.Now,
+                    Part = part
+                };
+                _context.Inventories.Add(inventory);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(UsageReport), new { id = id });
+        }
+
+        // GET: Parts/UsageReport/5
+        public async Task<IActionResult> UsageReport(int id)
+        {
+            var part = await _context.Parts.FindAsync(id);
+            if (part == null)
+            {
+                return NotFound();
+            }
+
+            return View(part);
         }
 
         private bool PartExists(int id)

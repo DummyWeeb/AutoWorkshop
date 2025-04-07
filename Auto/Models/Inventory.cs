@@ -21,6 +21,7 @@ namespace Auto.Models
         public DateTime? списания { get; set; }
         // Связи
         public int PartId { get; set; } // Внешний ключ к запчасти
+        [Display(Name = "Запчасть")]
         public Part? Part { get; set; } // Навигационное свойство для запчасти
     }
 }

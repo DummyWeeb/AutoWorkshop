@@ -14,9 +14,6 @@ namespace Auto.Models
         [Display(Name = "Название")]
         public string Name { get; set; }
 
-        [Display(Name = "Описание")]
-        public string? Description { get; set; } // Опциональное описание
-
         [Required(ErrorMessage = "Количество обязательно.")]
         [Range(0, int.MaxValue, ErrorMessage = "Количество должно быть неотрицательным.")]
         [Display(Name = "Количество")]

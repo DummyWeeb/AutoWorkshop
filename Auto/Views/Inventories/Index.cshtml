@@ -6,14 +6,32 @@
 
 <h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<form method="get" asp-action="Index" class="form-inline mb-3">
+    <div class="form-group mr-2">
+        <label for="startDate" class="mr-2">Дата поступления с:</label>
+        <input type="date" id="startDate" name="startDate" class="form-control" />
+    </div>
+    <div class="form-group mr-2">
+        <label for="endDate" class="mr-2">Дата поступления по:</label>
+        <input type="date" id="endDate" name="endDate" class="form-control" />
+    </div>
+    <div class="form-group mr-2">
+        <label for="writeOffStartDate" class="mr-2">Дата списания с:</label>
+        <input type="date" id="writeOffStartDate" name="writeOffStartDate" class="form-control" />
+    </div>
+    <div class="form-group mr-2">
+        <label for="writeOffEndDate" class="mr-2">Дата списания по:</label>
+        <input type="date" id="writeOffEndDate" name="writeOffEndDate" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary mr-2">Фильтровать</button>
+    <button type="button" class="btn btn-secondary" onclick="clearFilters()">Очистить фильтры</button>
+</form>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Quantity)
+                @Html.DisplayNameFor(model => model.Part)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.поступления)
@@ -22,32 +40,39 @@
                 @Html.DisplayNameFor(model => model.списания)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Part)
+                @Html.DisplayNameFor(model => model.Quantity)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.поступления)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.списания)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Part.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.InventoryId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.InventoryId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.InventoryId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Part.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.поступления)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.списания)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Quantity)
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        function clearFilters() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('writeOffStartDate').value = '';
+            document.getElementById('writeOffEndDate').value = '';
+        }
+    </script>
+}

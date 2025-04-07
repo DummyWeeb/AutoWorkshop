@@ -18,13 +18,9 @@
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
+            
             <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="hidden" asp-for="Quantity" value="0" /> <!-- Скрываем поле для ввода количества и устанавливаем значение в 0 -->
+                <input type="hidden" asp-for="Quantity" value="0" /> 
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
