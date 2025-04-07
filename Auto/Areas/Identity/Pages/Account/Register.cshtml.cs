@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -21,7 +17,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using SQLitePCL;
 
 namespace Auto.Areas.Identity.Pages.Account
 {
@@ -52,55 +47,28 @@ namespace Auto.Areas.Identity.Pages.Account
             _context = context;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string ReturnUrl { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
         public List<SelectListItem> Podrazdelenies { get; private set; }
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
@@ -108,7 +76,7 @@ namespace Auto.Areas.Identity.Pages.Account
 
             [Required]
             [Display(Name = "Фамилия")]
-            [StringLength(255, ErrorMessage ="Фамилия не должна превышать 255 символов", MinimumLength = 2)]
+            [StringLength(255, ErrorMessage = "Фамилия не должна превышать 255 символов", MinimumLength = 2)]
             public string Surname { get; set; }
 
             [Required]
@@ -130,12 +98,10 @@ namespace Auto.Areas.Identity.Pages.Account
             public int PodrazdelenieId { get; set; }
         }
 
-
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
-            Podrazdelenies = _context.Podrazdelenies.Select(x => new
-            SelectListItem() {Value = x.PodrazdelenieId.ToString(), Text = x.PodrazdelenieName }).ToList();
+            Podrazdelenies = _context.Podrazdelenies.Select(x => new SelectListItem() { Value = x.PodrazdelenieId.ToString(), Text = x.PodrazdelenieName }).ToList();
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
@@ -164,6 +130,24 @@ namespace Auto.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    // Назначение роли в зависимости от подразделения
+                    var podrazdelenie = await _context.Podrazdelenies.FindAsync(Input.PodrazdelenieId);
+                    if (podrazdelenie != null)
+                    {
+                        switch (podrazdelenie.PodrazdelenieName)
+                        {
+                            case "ИТ":
+                                await _userManager.AddToRoleAsync(user, "IT");
+                                break;
+                            case "Кладовщик":
+                                await _userManager.AddToRoleAsync(user, "Warehouse");
+                                break;
+                            case "Отдел закупок":
+                                await _userManager.AddToRoleAsync(user, "Procurement");
+                                break;
+                        }
+                    }
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

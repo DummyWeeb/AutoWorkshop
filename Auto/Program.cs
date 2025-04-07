@@ -12,7 +12,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<CustomUser>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireITRole", policy => policy.RequireRole("IT"));
+    options.AddPolicy("RequireWarehouseRole", policy => policy.RequireRole("Warehouse"));
+    options.AddPolicy("RequireProcurementRole", policy => policy.RequireRole("Procurement"));
+});
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -21,6 +30,7 @@ using (var scope = app.Services.CreateScope())
 {
     var serviceProvider = scope.ServiceProvider;
     await InitData.InitializeAsync(serviceProvider);
+    await RoleInitializer.InitializeAsync(serviceProvider);
 }
 
 // Configure the HTTP request pipeline.

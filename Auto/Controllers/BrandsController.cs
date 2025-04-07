@@ -9,6 +9,7 @@ using Auto.Data;
 using Auto.Models;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Auto.Controllers
 {
@@ -24,6 +25,7 @@ namespace Auto.Controllers
         }
 
         // GET: Brands
+        [Authorize(Policy = "RequireITRole")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Brands.ToListAsync());
