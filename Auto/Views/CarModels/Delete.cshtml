@@ -1,14 +1,14 @@
 ﻿@model Auto.Models.CarModel
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Удаление модели автомобиля";
 }
 
-<h1>Delete</h1>
+<h1>Удалить</h1>
 
-<h3>Are you sure you want to delete this?</h3>
+<h3>Вы уверены, что хотите удалить эту модель автомобиля?</h3>
 <div>
-    <h4>CarModel</h4>
+    <h4>Модель автомобиля</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
@@ -43,7 +43,7 @@
     <form asp-action="Delete" method="post">
         <input type="hidden" asp-for="CarModelId" />
         <input type="hidden" name="brandId" value="@ViewBag.BrandId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index" asp-route-brandId="@ViewBag.BrandId">Back to List</a>
+        <input type="submit" value="Удалить" class="btn btn-danger" /> |
+        <a asp-action="Index" asp-route-brandId="@ViewBag.BrandId">Вернуться к списку</a>
     </form>
 </div>

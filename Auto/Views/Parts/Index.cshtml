@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<Auto.Models.Part>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = $"Список запчастей для модели {ViewBag.CarModelName}";
 }
 
-<h1>Index</h1>
+<h1>@ViewData["Title"]</h1>
 
 <p>
-    <a asp-action="Create" asp-route-carModelId="@ViewBag.CarModelId">Create New</a>
+    <a asp-action="Create" asp-route-carModelId="@ViewBag.CarModelId">Добавить новую деталь</a>
 </p>
 <table class="table">
     <thead>
@@ -32,7 +32,7 @@
                     @Html.DisplayFor(modelItem => item.Quantity)
                 </td>
                 <td>
-                    <a asp-action="Delete" asp-route-id="@item.PartId">Delete</a> |
+
                     <form asp-action="UsePart" method="post" style="display:inline;">
                         <input type="hidden" name="id" value="@item.PartId" />
                         <button type="submit" class="btn btn-primary">Отметить использование запчасти</button>

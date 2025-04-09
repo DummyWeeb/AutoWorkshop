@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Auto.Data;
 using Auto.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Auto.Controllers
 {
@@ -19,6 +20,7 @@ namespace Auto.Controllers
         }
 
         // GET: Inventories
+        [Authorize(Roles = "IT, Warehouse, Procurement, Administration")]
         public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate, DateTime? writeOffStartDate, DateTime? writeOffEndDate)
         {
             var inventories = _context.Inventories.Include(i => i.Part).AsQueryable();

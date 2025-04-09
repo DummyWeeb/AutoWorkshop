@@ -41,10 +41,17 @@ namespace Auto.Controllers
             }
             else
             {
+                var carModel = await _context.CarModels.FindAsync(carModelId);
+                if (carModel == null)
+                {
+                    return NotFound();
+                }
+
                 var partsForCarModel = await _context.Parts
                     .Where(p => p.CarModels.Any(cm => cm.CarModelId == carModelId))
                     .ToListAsync();
                 ViewBag.CarModelId = carModelId;
+                ViewBag.CarModelName = carModel.Name;
                 return View(partsForCarModel);
             }
         }
@@ -204,18 +211,17 @@ namespace Auto.Controllers
             var part = await _context.Parts.FindAsync(id);
             if (part != null)
             {
-                _context.Parts.Remove(part);
-                await _context.SaveChangesAsync();
-
-                // Обновление инвентаря
-                var inventory = new Inventory
+                if (part.Quantity > 0)
                 {
-                    PartId = part.PartId,
-                    Quantity = part.Quantity,
-                    списания = DateTime.Now,
-                    Part = part
-                };
-                _context.Inventories.Add(inventory);
+                    ModelState.AddModelError(string.Empty, "Невозможно удалить запчасть, так как её количество больше 0.");
+                    return View(part);
+                }
+
+                // Удаление связанных записей из таблицы Inventories
+                var inventories = _context.Inventories.Where(i => i.PartId == id);
+                _context.Inventories.RemoveRange(inventories);
+
+                _context.Parts.Remove(part);
                 await _context.SaveChangesAsync();
             }
 
