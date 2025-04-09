@@ -140,11 +140,14 @@ namespace Auto.Areas.Identity.Pages.Account
                             case "ИТ":
                                 await _userManager.AddToRoleAsync(user, "IT");
                                 break;
-                            case "Кладовщик":
+                            case "Кладовщики":
                                 await _userManager.AddToRoleAsync(user, "Warehouse");
                                 break;
                             case "Отдел закупок":
                                 await _userManager.AddToRoleAsync(user, "Procurement");
+                                break;
+                            case "Администрация":
+                                await _userManager.AddToRoleAsync(user, "Administration");
                                 break;
                         }
                     }

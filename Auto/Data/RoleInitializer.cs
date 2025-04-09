@@ -14,7 +14,7 @@ namespace Auto.Data
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<CustomUser>>();
 
-            string[] roleNames = { "IT", "Warehouse", "Procurement" };
+            string[] roleNames = { "IT", "Warehouse", "Procurement", "Administration" };
             IdentityResult roleResult;
 
             foreach (var roleName in roleNames)

@@ -25,13 +25,14 @@ namespace Auto.Controllers
         }
 
         // GET: Brands
-        [Authorize(Policy = "RequireITRole")]
+        [Authorize(Roles = "IT, Warehouse, Administration")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Brands.ToListAsync());
         }
 
         // GET: Brands/Details/5
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -50,6 +51,7 @@ namespace Auto.Controllers
         }
 
         // GET: Brands/Create
+        [Authorize(Roles = "IT, Warehouse")]
         public IActionResult Create()
         {
             return View();
@@ -58,6 +60,7 @@ namespace Auto.Controllers
         // POST: Brands/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Create([Bind("BrandId,Name,LogoPath")] Brand brand, IFormFile logoFile)
         {
             if (ModelState.IsValid)
@@ -82,6 +85,7 @@ namespace Auto.Controllers
         }
 
         // GET: Brands/Edit/5
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -100,6 +104,7 @@ namespace Auto.Controllers
         // POST: Brands/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Edit(int id, [Bind("BrandId,Name,LogoPath")] Brand brand, IFormFile logoFile)
         {
             if (id != brand.BrandId)
@@ -143,6 +148,7 @@ namespace Auto.Controllers
         }
 
         // GET: Brands/Delete/5
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -163,6 +169,7 @@ namespace Auto.Controllers
         // POST: Brands/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var brand = await _context.Brands.FindAsync(id);

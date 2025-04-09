@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Auto.Data;
 using Auto.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Auto.Controllers
 {
@@ -20,6 +21,7 @@ namespace Auto.Controllers
         }
 
         // GET: Suppliers
+        [Authorize(Roles = "IT, Procurement, Administration")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Suppliers.ToListAsync());
@@ -44,6 +46,7 @@ namespace Auto.Controllers
         }
 
         // GET: Suppliers/Create
+        [Authorize(Roles = "IT, Procurement")]
         public IActionResult Create()
         {
             return View();
@@ -66,6 +69,7 @@ namespace Auto.Controllers
         }
 
         // GET: Suppliers/Edit/5
+        [Authorize(Roles = "IT, Procurement")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -117,6 +121,7 @@ namespace Auto.Controllers
         }
 
         // GET: Suppliers/Delete/5
+        [Authorize(Roles = "IT, Procurement")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

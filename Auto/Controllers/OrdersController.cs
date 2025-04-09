@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Auto.Data;
 using Auto.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Auto.Controllers
 {
@@ -19,6 +20,7 @@ namespace Auto.Controllers
         }
 
         // GET: Orders
+        [Authorize(Roles = "IT, Procurement, Administration")]
         public async Task<IActionResult> Index()
         {
             var orders = await _context.Orders
@@ -30,6 +32,7 @@ namespace Auto.Controllers
         }
 
         // GET: Orders/Details/5
+        [Authorize(Roles = "IT, Procurement")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -51,6 +54,7 @@ namespace Auto.Controllers
         }
 
         // GET: Orders/Create
+        [Authorize(Roles = "IT, Procurement")]
         public IActionResult Create()
         {
             ViewBag.Parts = _context.Parts.ToList();
@@ -61,6 +65,7 @@ namespace Auto.Controllers
         // POST: Orders/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "IT, Procurement")]
         public async Task<IActionResult> Create([Bind("OrderId,OrderDate,TotalAmount,PricePerUnit,SupplierId,SupplierName,OrderParts")] Order order)
         {
             if (ModelState.IsValid)
@@ -76,6 +81,7 @@ namespace Auto.Controllers
         }
 
         // GET: Orders/Edit/5
+        [Authorize(Roles = "IT, Procurement")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -98,6 +104,7 @@ namespace Auto.Controllers
         // POST: Orders/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "IT, Procurement")]
         public async Task<IActionResult> Edit(int id, [Bind("OrderId,OrderDate,TotalAmount,Status,PricePerUnit,SupplierId,SupplierName,OrderParts")] Order order)
         {
             if (id != order.OrderId)
@@ -131,6 +138,7 @@ namespace Auto.Controllers
         }
 
         // GET: Orders/Delete/5
+        [Authorize(Roles = "IT, Procurement")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -154,6 +162,7 @@ namespace Auto.Controllers
         // POST: Orders/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "IT, Procurement")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var order = await _context.Orders

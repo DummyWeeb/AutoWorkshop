@@ -7,19 +7,32 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Auto.Data;
 using Auto.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using DinkToPdf.Contracts;
+using Auto.Services;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Auto.Controllers
 {
     public class PartsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<CustomUser> _userManager;
+        private readonly PdfService _pdfService;
+        private readonly ICompositeViewEngine _viewEngine;
 
-        public PartsController(ApplicationDbContext context)
+        public PartsController(ApplicationDbContext context, UserManager<CustomUser> userManager, PdfService pdfService, ICompositeViewEngine viewEngine)
         {
             _context = context;
+            _userManager = userManager;
+            _pdfService = pdfService;
+            _viewEngine = viewEngine;
         }
 
         // GET: Parts
+        [Authorize(Roles = "IT, Warehouse, Administration")]
         public async Task<IActionResult> Index(int? carModelId)
         {
             if (carModelId == null)
@@ -37,6 +50,7 @@ namespace Auto.Controllers
         }
 
         // GET: Parts/Details/5
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -55,6 +69,7 @@ namespace Auto.Controllers
         }
 
         // GET: Parts/Create
+        [Authorize(Roles = "IT, Warehouse")]
         public IActionResult Create(int carModelId)
         {
             ViewBag.CarModelId = carModelId;
@@ -65,6 +80,7 @@ namespace Auto.Controllers
         // POST: Parts/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Create([Bind("PartId,Name")] Part part, int carModelId)
         {
             if (ModelState.IsValid)
@@ -97,6 +113,7 @@ namespace Auto.Controllers
         }
 
         // GET: Parts/Edit/5
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -116,6 +133,7 @@ namespace Auto.Controllers
         // POST: Parts/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Edit(int id, [Bind("PartId,Name,Quantity,CarModelId")] Part part)
         {
             if (id != part.PartId)
@@ -159,6 +177,7 @@ namespace Auto.Controllers
         }
 
         // GET: Parts/Delete/5
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -179,6 +198,7 @@ namespace Auto.Controllers
         // POST: Parts/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var part = await _context.Parts.FindAsync(id);
@@ -205,8 +225,18 @@ namespace Auto.Controllers
         // POST: Parts/UsePart
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> UsePart(int id)
         {
+            var user = await _userManager.Users
+                .Include(u => u.Podrazdelenie)
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
+
+            if (user?.Podrazdelenie?.PodrazdelenieName == "Администрация")
+            {
+                return Forbid();
+            }
+
             var part = await _context.Parts.FindAsync(id);
             if (part != null && part.Quantity > 0)
             {
@@ -229,6 +259,7 @@ namespace Auto.Controllers
         }
 
         // GET: Parts/UsageReport/5
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> UsageReport(int id)
         {
             var part = await _context.Parts.FindAsync(id);
@@ -243,6 +274,46 @@ namespace Auto.Controllers
         private bool PartExists(int id)
         {
             return _context.Parts.Any(e => e.PartId == id);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadPdf(int id)
+        {
+            var part = await _context.Parts.FindAsync(id);
+            if (part == null)
+            {
+                return NotFound();
+            }
+
+            var htmlContent = await RenderViewToStringAsync("UsageReport", part);
+            var pdfBytes = _pdfService.GeneratePdf(htmlContent);
+
+            return File(pdfBytes, "application/pdf", "UsageReport.pdf");
+        }
+
+        private async Task<string> RenderViewToStringAsync(string viewName, object model)
+        {
+            ViewData.Model = model;
+            using (var writer = new StringWriter())
+            {
+                var viewResult = _viewEngine.FindView(ControllerContext, viewName, false);
+                if (viewResult.View == null)
+                {
+                    throw new ArgumentNullException($"View {viewName} not found");
+                }
+
+                var viewContext = new ViewContext(
+                    ControllerContext,
+                    viewResult.View,
+                    ViewData,
+                    TempData,
+                    writer,
+                    new HtmlHelperOptions()
+                );
+
+                await viewResult.View.RenderAsync(viewContext);
+                return writer.GetStringBuilder().ToString();
+            }
         }
     }
 }

@@ -6,25 +6,33 @@
 
 <h1>Index</h1>
 
-<form method="get" asp-action="Index" class="form-inline mb-3">
-    <div class="form-group mr-2">
-        <label for="startDate" class="mr-2">Дата поступления с:</label>
-        <input type="date" id="startDate" name="startDate" class="form-control" />
+<form id="filterForm" method="get" asp-action="Index" class="mb-3">
+    <div class="form-row align-items-end">
+        <div class="form-group col-md-6">
+            <label>Дата поступления:</label>
+            <div class="input-group">
+                <input type="date" id="startDate" name="startDate" class="form-control" placeholder="с" />
+                <span class="mx-2"> </span>
+                <input type="date" id="endDate" name="endDate" class="form-control" placeholder="по" />
+            </div>
+        </div>
+        <div class="form-group col-md-6">
+            <label>Дата списания:</label>
+            <div class="input-group">
+                <input type="date" id="writeOffStartDate" name="writeOffStartDate" class="form-control" placeholder="с" />
+                <span class="mx-2"> </span>
+                <input type="date" id="writeOffEndDate" name="writeOffEndDate" class="form-control" placeholder="по" />
+            </div>
+        </div>
     </div>
-    <div class="form-group mr-2">
-        <label for="endDate" class="mr-2">Дата поступления по:</label>
-        <input type="date" id="endDate" name="endDate" class="form-control" />
+
+    <!-- Пропуск строки перед кнопками -->
+    <div class="form-row mt-3">
+        <div class="form-group col-md-12">
+            <button type="submit" class="btn btn-primary mr-2">Фильтровать</button>
+            <button type="button" class="btn btn-secondary" onclick="clearFilters()">Очистить фильтры</button>
+        </div>
     </div>
-    <div class="form-group mr-2">
-        <label for="writeOffStartDate" class="mr-2">Дата списания с:</label>
-        <input type="date" id="writeOffStartDate" name="writeOffStartDate" class="form-control" />
-    </div>
-    <div class="form-group mr-2">
-        <label for="writeOffEndDate" class="mr-2">Дата списания по:</label>
-        <input type="date" id="writeOffEndDate" name="writeOffEndDate" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary mr-2">Фильтровать</button>
-    <button type="button" class="btn btn-secondary" onclick="clearFilters()">Очистить фильтры</button>
 </form>
 
 <table class="table">
@@ -73,6 +81,7 @@
             document.getElementById('endDate').value = '';
             document.getElementById('writeOffStartDate').value = '';
             document.getElementById('writeOffEndDate').value = '';
+            document.getElementById('filterForm').submit();
         }
     </script>
 }

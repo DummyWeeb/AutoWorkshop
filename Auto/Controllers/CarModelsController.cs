@@ -9,6 +9,7 @@ using Auto.Data;
 using Auto.Models;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Auto.Controllers
 {
@@ -24,6 +25,7 @@ namespace Auto.Controllers
         }
 
         // GET: CarModels
+        [Authorize(Roles = "IT, Warehouse, Administration")]
         public async Task<IActionResult> Index(int? brandId)
         {
             if (brandId == null)
@@ -46,6 +48,7 @@ namespace Auto.Controllers
         }
 
         // GET: CarModels/Details/5
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Details(int? id, int? brandId)
         {
             if (id == null)
@@ -66,6 +69,7 @@ namespace Auto.Controllers
         }
 
         // GET: CarModels/Create
+        [Authorize(Roles = "IT, Warehouse")]
         public IActionResult Create(int? brandId)
         {
             ViewBag.BrandId = brandId;
@@ -76,6 +80,7 @@ namespace Auto.Controllers
         // POST: CarModels/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Create([Bind("CarModelId,Name,Year,BrandId,LogoPath")] CarModel carModel, IFormFile logoFile)
         {
             if (ModelState.IsValid)
@@ -101,6 +106,7 @@ namespace Auto.Controllers
         }
 
         // GET: CarModels/Edit/5
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Edit(int? id, int? brandId)
         {
             if (id == null)
@@ -121,6 +127,7 @@ namespace Auto.Controllers
         // POST: CarModels/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Edit(int id, [Bind("CarModelId,Name,Year,BrandId,LogoPath")] CarModel carModel, IFormFile logoFile)
         {
             if (id != carModel.CarModelId)
@@ -165,6 +172,7 @@ namespace Auto.Controllers
         }
 
         // GET: CarModels/Delete/5
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> Delete(int? id, int? brandId)
         {
             if (id == null)
@@ -187,6 +195,7 @@ namespace Auto.Controllers
         // POST: CarModels/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "IT, Warehouse")]
         public async Task<IActionResult> DeleteConfirmed(int id, int? brandId)
         {
             var carModel = await _context.CarModels.FindAsync(id);
