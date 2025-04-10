@@ -77,8 +77,14 @@ namespace Auto.Controllers
 
         // GET: Parts/Create
         [Authorize(Roles = "IT, Warehouse")]
-        public IActionResult Create(int carModelId)
+        public IActionResult Create(int? carModelId)
         {
+            if (carModelId == null)
+            {
+                // Перенаправление на страницу с ошибкой или на главную страницу
+                return RedirectToAction("Index", "Home");
+            }
+
             ViewBag.CarModelId = carModelId;
             ViewBag.CarModels = _context.CarModels.ToList();
             return View();
@@ -88,8 +94,14 @@ namespace Auto.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "IT, Warehouse")]
-        public async Task<IActionResult> Create([Bind("PartId,Name")] Part part, int carModelId)
+        public async Task<IActionResult> Create([Bind("PartId,Name")] Part part, int? carModelId)
         {
+            if (carModelId == null)
+            {
+                // Перенаправление на страницу с ошибкой или на главную страницу
+                return RedirectToAction("Index", "Home");
+            }
+
             if (ModelState.IsValid)
             {
                 var carModel = await _context.CarModels.FindAsync(carModelId);
@@ -217,11 +229,9 @@ namespace Auto.Controllers
                     return View(part);
                 }
 
-                // Удаление связанных записей из таблицы Inventories
-                var inventories = _context.Inventories.Where(i => i.PartId == id);
-                _context.Inventories.RemoveRange(inventories);
-
-                _context.Parts.Remove(part);
+                // Помечаем запчасть как удаленную
+                part.Name += " (удалено)";
+                _context.Parts.Update(part);
                 await _context.SaveChangesAsync();
             }
 
@@ -275,6 +285,18 @@ namespace Auto.Controllers
             }
 
             return View(part);
+        }
+
+        // GET: Parts/History/5
+        [Authorize(Roles = "IT, Warehouse, Administration")]
+        public async Task<IActionResult> History(int partId)
+        {
+            var inventories = await _context.Inventories
+                .Include(i => i.Part)
+                .Where(i => i.PartId == partId)
+                .ToListAsync();
+
+            return View(inventories);
         }
 
         private bool PartExists(int id)
