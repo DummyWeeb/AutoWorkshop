@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Auto.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250330203855_migr1")]
+    [Migration("20250410164915_migr1")]
     partial class migr1
     {
         /// <inheritdoc />
@@ -112,9 +112,6 @@ namespace Auto.Migrations
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<decimal>("PricePerUnit")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -471,16 +468,21 @@ namespace Auto.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Ima")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("PodrazdelenieId")
                         .HasColumnType("int");
 
                     b.Property<string>("SecSurname")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Surname")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasIndex("PodrazdelenieId");
 

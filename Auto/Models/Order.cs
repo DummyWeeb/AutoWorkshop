@@ -20,8 +20,8 @@ namespace Auto.Models
         [Display(Name = "Статус")]
         public OrderStatus Status { get; set; } = OrderStatus.Заказано;
 
-        [Display(Name = "Цена за единицу")]
-        public decimal PricePerUnit { get; set; }
+        [Display(Name = "Номер заказа")]
+        public int OrderNumber => OrderId; // Используем OrderId в качестве номера заказа
 
         // Связи
         public int SupplierId { get; set; }

@@ -117,9 +117,9 @@ namespace Auto.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
-                    Surname = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Ima = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecSurname = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Surname = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Ima = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    SecSurname = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     Age = table.Column<int>(type: "int", nullable: true),
                     PodrazdelenieId = table.Column<int>(type: "int", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -157,7 +157,6 @@ namespace Auto.Migrations
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    PricePerUnit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     SupplierId = table.Column<int>(type: "int", nullable: false),
                     SupplierName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },

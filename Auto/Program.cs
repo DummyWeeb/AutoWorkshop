@@ -5,7 +5,11 @@ using DinkToPdf;
 using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Options;
 using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Mvc.Razor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +21,8 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<CustomUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddErrorDescriber<CustomIdentityErrorDescriber>();
 
 builder.Services.AddAuthorization(options =>
 {
@@ -27,7 +32,19 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireAdministrationRole", policy => policy.RequireRole("Administration"));
 });
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+    .AddDataAnnotationsLocalization();
+
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[] { new CultureInfo("en-US"), new CultureInfo("ru-RU") };
+    options.DefaultRequestCulture = new RequestCulture("ru-RU");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
 
 // Register PdfService and IConverter
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
@@ -49,8 +66,6 @@ if (wkHtmlToPdfPath.Length > 255)
 {
     throw new PathTooLongException("Путь до библиотеки libwkhtmltox.dll превышает 255 символов");
 }
-
-
 
 var app = builder.Build();
 
@@ -74,9 +89,15 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+var localizationOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
+app.UseRequestLocalization(localizationOptions.Value);
 
 app.MapStaticAssets();
 
@@ -89,5 +110,3 @@ app.MapRazorPages()
    .WithStaticAssets();
 
 app.Run();
-
-

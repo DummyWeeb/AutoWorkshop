@@ -54,22 +54,18 @@ namespace Auto.Controllers
             return View(order);
         }
 
-        // GET: Orders/Create
         [Authorize(Roles = "IT, Procurement")]
         public IActionResult Create()
         {
             ViewBag.Parts = _context.Parts.ToList();
             ViewBag.Suppliers = _context.Suppliers.ToList();
-            ViewBag.PartsJson = JsonConvert.SerializeObject(_context.Parts.Select(p => p.Name).ToList());
-            ViewBag.SuppliersJson = JsonConvert.SerializeObject(_context.Suppliers.Select(s => s.Name).ToList());
             return View();
         }
 
-        // POST: Orders/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "IT, Procurement")]
-        public async Task<IActionResult> Create([Bind("OrderId,OrderDate,TotalAmount,PricePerUnit,SupplierName,OrderParts")] Order order)
+        public async Task<IActionResult> Create([Bind("OrderId,OrderDate,TotalAmount,SupplierName,OrderParts")] Order order)
         {
             if (ModelState.IsValid)
             {
@@ -83,8 +79,6 @@ namespace Auto.Controllers
                     ModelState.AddModelError("SupplierName", "Поставщик не найден.");
                     ViewBag.Parts = _context.Parts.ToList();
                     ViewBag.Suppliers = _context.Suppliers.ToList();
-                    ViewBag.PartsJson = JsonConvert.SerializeObject(_context.Parts.Select(p => p.Name).ToList());
-                    ViewBag.SuppliersJson = JsonConvert.SerializeObject(_context.Suppliers.Select(s => s.Name).ToList());
                     return View(order);
                 }
 
@@ -100,8 +94,6 @@ namespace Auto.Controllers
                         ModelState.AddModelError("OrderParts", $"Запчасть '{orderPart.PartName}' не найдена.");
                         ViewBag.Parts = _context.Parts.ToList();
                         ViewBag.Suppliers = _context.Suppliers.ToList();
-                        ViewBag.PartsJson = JsonConvert.SerializeObject(_context.Parts.Select(p => p.Name).ToList());
-                        ViewBag.SuppliersJson = JsonConvert.SerializeObject(_context.Suppliers.Select(s => s.Name).ToList());
                         return View(order);
                     }
                 }
@@ -110,10 +102,9 @@ namespace Auto.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             ViewBag.Parts = _context.Parts.ToList();
             ViewBag.Suppliers = _context.Suppliers.ToList();
-            ViewBag.PartsJson = JsonConvert.SerializeObject(_context.Parts.Select(p => p.Name).ToList());
-            ViewBag.SuppliersJson = JsonConvert.SerializeObject(_context.Suppliers.Select(s => s.Name).ToList());
             return View(order);
         }
 
@@ -121,7 +112,7 @@ namespace Auto.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "IT, Procurement")]
-        public async Task<IActionResult> Edit(int id, [Bind("OrderId,OrderDate,TotalAmount,Status,PricePerUnit,SupplierId,SupplierName,OrderParts")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("OrderId,OrderDate,TotalAmount,Status,SupplierId,SupplierName,OrderParts")] Order order)
         {
             if (id != order.OrderId)
             {
