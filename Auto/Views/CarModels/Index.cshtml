@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<Auto.Models.CarModel>
 
 @{
-    ViewData["Title"] = $"Модели машины: {ViewBag.BrandName}";
+    ViewData["Title"] = $"Модели марки: {ViewBag.BrandName}";
 }
 
 <h1>Модели машины: @ViewBag.BrandName</h1>
 
 <p>
-    <a asp-action="Create" asp-route-brandId="@ViewBag.BrandId">Добавить новую модель</a>
+    <a asp-action="Create" asp-route-brandId="@ViewBag.BrandId" class="btn btn-primary" >Добавить новую модель</a>
 </p>
 <table class="table">
     <thead>

@@ -27,26 +27,14 @@
                 <span asp-validation-for="PricePerUnit" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="SupplierId" class="control-label">Выберите поставщика</label>
-                <select asp-for="SupplierId" class="form-control">
-                    <option value="">Выберите поставщика</option>
-                    @foreach (var supplier in ViewBag.Suppliers)
-                    {
-                        <option value="@supplier.SupplierId">@supplier.Name</option>
-                    }
-                </select>
-                <span asp-validation-for="SupplierId" class="text-danger"></span>
+                <label asp-for="SupplierName" class="control-label">Выберите поставщика</label>
+                <input id="supplierInput" name="SupplierName" class="form-control" />
+                <span asp-validation-for="SupplierName" class="text-danger"></span>
             </div>
             <div id="orderPartsContainer">
                 <div class="form-group">
                     <label>Запчасть</label>
-                    <select name="OrderParts[0].PartId" class="form-control">
-                        <option value="">Выберите запчасть</option>
-                        @foreach (var part in ViewBag.Parts)
-                        {
-                            <option value="@part.PartId">@part.Name</option>
-                        }
-                    </select>
+                    <input name="OrderParts[0].PartName" class="form-control partInput" />
                     <label>Количество</label>
                     <input name="OrderParts[0].Quantity" class="form-control" />
                 </div>
@@ -64,29 +52,59 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+    @Html.Partial("_ValidationScriptsPartial")
     <script>
-        let orderPartIndex = 1;
-        document.getElementById('addOrderPart').addEventListener('click', function () {
-            const container = document.getElementById('orderPartsContainer');
-            const newOrderPart = document.createElement('div');
-            newOrderPart.classList.add('form-group');
-            newOrderPart.innerHTML = `
-                <label>Запчасть</label>
-                <select name="OrderParts[${orderPartIndex}].PartId" class="form-control">
-                    <option value="">Выберите запчасть</option>
-        @foreach (var part in ViewBag.Parts)
-        {
-                                <option value="@part.PartId">@part.Name</option>
-        }
-                </select>
-                <label>Количество</label>
-                <input name="OrderParts[${orderPartIndex}].Quantity" class="form-control" />
-            `;
-            container.appendChild(newOrderPart);
-            orderPartIndex++;
+        $(function () {
+            // Autocomplete for suppliers
+            var suppliers = @Html.Raw(ViewBag.SuppliersJson);
+            $("#supplierInput").autocomplete({
+                source: function (request, response) {
+                    var results = $.ui.autocomplete.filter(suppliers, request.term);
+                    response(results.slice(0, 5));
+                }
+            }).focus(function () {
+                $(this).autocomplete("search", "");
+            }).click(function () {
+                $(this).autocomplete("search", "");
+            });
+
+            // Autocomplete for parts
+            var parts = @Html.Raw(ViewBag.PartsJson);
+            $(document).on("focus", ".partInput", function () {
+                $(this).autocomplete({
+                    source: function (request, response) {
+                        var results = $.ui.autocomplete.filter(parts, request.term);
+                        response(results.slice(0, 5));
+                    }
+                }).focus(function () {
+                    $(this).autocomplete("search", "");
+                }).click(function () {
+                    $(this).autocomplete("search", "");
+                });
+            });
+
+            let orderPartIndex = 1;
+            document.getElementById('addOrderPart').addEventListener('click', function () {
+                const container = document.getElementById('orderPartsContainer');
+                const newOrderPart = document.createElement('div');
+                newOrderPart.classList.add('form-group');
+                newOrderPart.innerHTML = `
+                    <label>Запчасть</label>
+                    <input name="OrderParts[${orderPartIndex}].PartName" class="form-control partInput" />
+                    <label>Количество</label>
+                    <input name="OrderParts[${orderPartIndex}].Quantity" class="form-control" />
+                    <button type="button" class="btn btn-danger removeOrderPart">Удалить</button>
+                `;
+                container.appendChild(newOrderPart);
+                orderPartIndex++;
+            });
+
+            $(document).on('click', '.removeOrderPart', function () {
+                $(this).closest('.form-group').remove();
+            });
         });
     </script>
 }

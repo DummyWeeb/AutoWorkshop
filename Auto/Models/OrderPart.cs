@@ -1,5 +1,6 @@
 ﻿using Auto.Models;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 public class OrderPart
 {
@@ -18,4 +19,6 @@ public class OrderPart
 
     public int? CarModelId { get; set; } // Сделаем CarModelId необязательным
     public CarModel? CarModel { get; set; }
+    [NotMapped]
+    public string? PartName { get; set; }
 }

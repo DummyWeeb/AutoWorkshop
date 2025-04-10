@@ -319,7 +319,7 @@ namespace Auto.Controllers
             return File(pdfBytes, "application/pdf", "UsageReport.pdf");
         }
 
-        private async Task<string> RenderViewToStringAsync(string viewName, object model)
+        private async Task<string> RenderViewToStringAsync(string viewName, object model, object routeValues = null)
         {
             ViewData.Model = model;
             using (var writer = new StringWriter())
@@ -338,6 +338,14 @@ namespace Auto.Controllers
                     writer,
                     new HtmlHelperOptions()
                 );
+
+                if (routeValues != null)
+                {
+                    foreach (var routeValue in new RouteValueDictionary(routeValues))
+                    {
+                        viewContext.RouteData.Values[routeValue.Key] = routeValue.Value;
+                    }
+                }
 
                 await viewResult.View.RenderAsync(viewContext);
                 return writer.GetStringBuilder().ToString();

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Auto.Data;
 using Auto.Models;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 
 namespace Auto.Controllers
 {
@@ -59,6 +60,8 @@ namespace Auto.Controllers
         {
             ViewBag.Parts = _context.Parts.ToList();
             ViewBag.Suppliers = _context.Suppliers.ToList();
+            ViewBag.PartsJson = JsonConvert.SerializeObject(_context.Parts.Select(p => p.Name).ToList());
+            ViewBag.SuppliersJson = JsonConvert.SerializeObject(_context.Suppliers.Select(s => s.Name).ToList());
             return View();
         }
 
@@ -66,38 +69,51 @@ namespace Auto.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "IT, Procurement")]
-        public async Task<IActionResult> Create([Bind("OrderId,OrderDate,TotalAmount,PricePerUnit,SupplierId,SupplierName,OrderParts")] Order order)
+        public async Task<IActionResult> Create([Bind("OrderId,OrderDate,TotalAmount,PricePerUnit,SupplierName,OrderParts")] Order order)
         {
             if (ModelState.IsValid)
             {
-                order.Status = OrderStatus.Заказано; // Устанавливаем статус по умолчанию
+                var supplier = await _context.Suppliers.FirstOrDefaultAsync(s => s.Name == order.SupplierName);
+                if (supplier != null)
+                {
+                    order.SupplierId = supplier.SupplierId;
+                }
+                else
+                {
+                    ModelState.AddModelError("SupplierName", "Поставщик не найден.");
+                    ViewBag.Parts = _context.Parts.ToList();
+                    ViewBag.Suppliers = _context.Suppliers.ToList();
+                    ViewBag.PartsJson = JsonConvert.SerializeObject(_context.Parts.Select(p => p.Name).ToList());
+                    ViewBag.SuppliersJson = JsonConvert.SerializeObject(_context.Suppliers.Select(s => s.Name).ToList());
+                    return View(order);
+                }
+
+                foreach (var orderPart in order.OrderParts)
+                {
+                    var part = await _context.Parts.FirstOrDefaultAsync(p => p.Name == orderPart.PartName);
+                    if (part != null)
+                    {
+                        orderPart.PartId = part.PartId;
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("OrderParts", $"Запчасть '{orderPart.PartName}' не найдена.");
+                        ViewBag.Parts = _context.Parts.ToList();
+                        ViewBag.Suppliers = _context.Suppliers.ToList();
+                        ViewBag.PartsJson = JsonConvert.SerializeObject(_context.Parts.Select(p => p.Name).ToList());
+                        ViewBag.SuppliersJson = JsonConvert.SerializeObject(_context.Suppliers.Select(s => s.Name).ToList());
+                        return View(order);
+                    }
+                }
+
                 _context.Add(order);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Parts = _context.Parts.ToList();
             ViewBag.Suppliers = _context.Suppliers.ToList();
-            return View(order);
-        }
-
-        // GET: Orders/Edit/5
-        [Authorize(Roles = "IT, Procurement")]
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var order = await _context.Orders
-                .Include(o => o.OrderParts)
-                .FirstOrDefaultAsync(m => m.OrderId == id);
-            if (order == null)
-            {
-                return NotFound();
-            }
-            ViewBag.Parts = _context.Parts.ToList();
-            ViewBag.Suppliers = _context.Suppliers.ToList();
+            ViewBag.PartsJson = JsonConvert.SerializeObject(_context.Parts.Select(p => p.Name).ToList());
+            ViewBag.SuppliersJson = JsonConvert.SerializeObject(_context.Suppliers.Select(s => s.Name).ToList());
             return View(order);
         }
 
@@ -134,6 +150,8 @@ namespace Auto.Controllers
             }
             ViewBag.Parts = _context.Parts.ToList();
             ViewBag.Suppliers = _context.Suppliers.ToList();
+            ViewBag.PartsJson = JsonConvert.SerializeObject(_context.Parts.Select(p => p.Name).ToList());
+            ViewBag.SuppliersJson = JsonConvert.SerializeObject(_context.Suppliers.Select(s => s.Name).ToList());
             return View(order);
         }
 
