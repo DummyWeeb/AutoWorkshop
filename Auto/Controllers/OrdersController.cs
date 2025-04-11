@@ -8,28 +8,106 @@ using Auto.Data;
 using Auto.Models;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
+using Auto.Services;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Auto.Controllers
 {
     public class OrdersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly PdfService _pdfService;
+        private readonly ITempDataProvider _tempDataProvider;
+        private readonly ICompositeViewEngine _viewEngine;
 
-        public OrdersController(ApplicationDbContext context)
+        public OrdersController(ApplicationDbContext context, PdfService pdfService, ITempDataProvider tempDataProvider, ICompositeViewEngine viewEngine)
         {
             _context = context;
+            _pdfService = pdfService;
+            _tempDataProvider = tempDataProvider;
+            _viewEngine = viewEngine;
         }
 
         // GET: Orders
         [Authorize(Roles = "IT, Procurement, Administration")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate)
         {
-            var orders = await _context.Orders
+            var ordersQuery = _context.Orders
                 .Include(o => o.Supplier)
                 .Include(o => o.OrderParts)
                     .ThenInclude(op => op.Part)
-                .ToListAsync();
+                .AsQueryable();
+
+            if (startDate.HasValue)
+            {
+                ordersQuery = ordersQuery.Where(o => o.OrderDate >= startDate.Value);
+            }
+
+            if (endDate.HasValue)
+            {
+                ordersQuery = ordersQuery.Where(o => o.OrderDate <= endDate.Value);
+            }
+
+            var orders = await ordersQuery.ToListAsync();
+            ViewBag.StartDate = startDate;
+            ViewBag.EndDate = endDate;
             return View(orders);
+        }
+
+        [Authorize(Roles = "IT, Procurement, Administration")]
+        public async Task<IActionResult> DownloadPdf(DateTime? startDate, DateTime? endDate)
+        {
+            var ordersQuery = _context.Orders
+                .Include(o => o.Supplier)
+                .Include(o => o.OrderParts)
+                    .ThenInclude(op => op.Part)
+                .AsQueryable();
+
+            if (startDate.HasValue)
+            {
+                ordersQuery = ordersQuery.Where(o => o.OrderDate >= startDate.Value);
+            }
+
+            if (endDate.HasValue)
+            {
+                ordersQuery = ordersQuery.Where(o => o.OrderDate <= endDate.Value);
+            }
+
+            var orders = await ordersQuery.ToListAsync();
+
+            var htmlContent = await RenderViewToStringAsync("Index", orders, true);
+            var pdf = _pdfService.GeneratePdf(htmlContent);
+            return File(pdf, "application/pdf", "OrdersReport.pdf");
+        }
+
+        private async Task<string> RenderViewToStringAsync(string viewName, object model, bool isPdf = false)
+        {
+            var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+            {
+                Model = model
+            };
+            var tempData = new TempDataDictionary(HttpContext, _tempDataProvider);
+            using (var writer = new StringWriter())
+            {
+                var viewResult = _viewEngine.FindView(ControllerContext, viewName, false);
+                if (viewResult.View == null)
+                {
+                    throw new ArgumentNullException($"View {viewName} not found");
+                }
+                var viewContext = new ViewContext(
+                    ControllerContext,
+                    viewResult.View,
+                    viewData,
+                    tempData,
+                    writer,
+                    new HtmlHelperOptions()
+                );
+                viewContext.RouteData.Values["isPdf"] = isPdf;
+                await viewResult.View.RenderAsync(viewContext);
+                return writer.ToString();
+            }
         }
 
         // GET: Orders/Details/5

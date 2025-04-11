@@ -3,13 +3,52 @@
 
 @{
     ViewData["Title"] = "Список заказов";
+    var isPdf = Context.Request.Query["isPdf"].ToString() == "true";
+    var startDate = Context.Request.Query["startDate"].ToString();
+    var endDate = Context.Request.Query["endDate"].ToString();
+    var totalAmount = Model.Sum(order => order.TotalAmount);
 }
 
-<h1>Список заказов</h1>
+@if (!isPdf)
+{
+    <h1>Список заказов</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Создать новый заказ</a>
-</p>
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Создать новый заказ</a>
+    </p>
+
+    <form id="filterForm" method="get" asp-action="Index" class="mb-3">
+        <div class="form-row align-items-end">
+            <div class="form-group col-md-6">
+                <label>Дата заказа:</label>
+                <div class="input-group">
+                    <input type="date" id="startDate" name="startDate" class="form-control" value="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" placeholder="с" />
+                    <span class="mx-2"> </span>
+                    <input type="date" id="endDate" name="endDate" class="form-control" value="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" placeholder="по" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row mt-3">
+            <div class="form-group col-md-12">
+                <button type="submit" class="btn btn-primary mr-2">Фильтровать</button>
+                <button type="button" class="btn btn-secondary" onclick="clearFilters()">Очистить фильтры</button>
+            </div>
+        </div>
+    </form>
+
+    <p>
+        <a asp-action="DownloadPdf" asp-route-startDate="@Context.Request.Query["startDate"]" asp-route-endDate="@Context.Request.Query["endDate"]" asp-route-isPdf="true" class="btn btn-danger">Сохранить отчет в PDF</a>
+    </p>
+}
+
+@if (isPdf)
+{
+    <link rel="stylesheet" href="~/css/pdfStyles.css" />
+    <h1>Список заказов за @(string.IsNullOrEmpty(startDate) ? "весь" : DateTime.Parse(startDate).ToString("dd.MM.yyyy")) - @(string.IsNullOrEmpty(endDate) ? "период" : DateTime.Parse(endDate).ToString("dd.MM.yyyy"))</h1>
+    <h2>Общая сумма заказов за выбранный период: @totalAmount</h2>
+}
+
 <table class="table">
     <thead>
         <tr>
@@ -23,10 +62,16 @@
                 @Html.DisplayNameFor(model => model.TotalAmount)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Status)
+                @Html.DisplayNameFor(model => model.SupplierName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SupplierName)
+                Запчасти
+            </th>
+            <th>
+                Количество
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
             </th>
             <th></th>
         </tr>
@@ -45,10 +90,22 @@
                     @Html.DisplayFor(modelItem => item.TotalAmount)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Status)
+                    @Html.DisplayFor(modelItem => item.SupplierName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.SupplierName)
+                    @foreach (var part in item.OrderParts)
+                    {
+                        <div>@part.Part?.Name</div>
+                    }
+                </td>
+                <td>
+                    @foreach (var part in item.OrderParts)
+                    {
+                        <div>@part.Quantity</div>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
                 </td>
                 <td>
                     @if (item.Status == OrderStatus.Заказано)
@@ -63,3 +120,20 @@
         }
     </tbody>
 </table>
+
+<div class="footer">
+    <p>Сформировано @DateTime.Now.ToString("dd MMMM yyyy")</p>
+</div>
+
+@if (!isPdf)
+{
+    @section Scripts {
+    <script>
+        function clearFilters() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('filterForm').submit();
+        }
+    </script>
+    }
+}
