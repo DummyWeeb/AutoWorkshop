@@ -170,8 +170,8 @@ namespace Auto.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        // Не входить в систему под новым пользователем
+                        return RedirectToAction("Index", "CustomUser", new { area = "" });
                     }
                 }
                 foreach (var error in result.Errors)

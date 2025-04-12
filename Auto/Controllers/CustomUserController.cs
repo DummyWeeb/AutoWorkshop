@@ -1,7 +1,12 @@
-﻿using Auto.Models;
+﻿using Auto.Data;
+using Auto.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Auto.Controllers
@@ -11,16 +16,21 @@ namespace Auto.Controllers
     {
         private readonly UserManager<CustomUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _context;
+        private readonly ILogger<CustomUserController> _logger;
 
-        public CustomUserController(UserManager<CustomUser> userManager, RoleManager<IdentityRole> roleManager)
+        public CustomUserController(UserManager<CustomUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context, ILogger<CustomUserController> logger)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _context = context;
+            _logger = logger;
         }
 
         // GET: CustomUser/Create
         public IActionResult Create()
         {
+            ViewBag.PodrazdelenieId = new SelectList(_context.Podrazdelenies, "PodrazdelenieId", "PodrazdelenieName");
             return View();
         }
 
@@ -48,6 +58,7 @@ namespace Auto.Controllers
                     // Добавление пользователя в роль
                     await _userManager.AddToRoleAsync(user, "User");
 
+                    // Оставляем текущего пользователя в системе
                     return RedirectToAction(nameof(Index));
                 }
                 foreach (var error in result.Errors)
@@ -55,13 +66,14 @@ namespace Auto.Controllers
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
+            ViewBag.PodrazdelenieId = new SelectList(_context.Podrazdelenies, "PodrazdelenieId", "PodrazdelenieName", model.PodrazdelenieId);
             return View(model);
         }
 
         // GET: CustomUser/Index
         public async Task<IActionResult> Index()
         {
-            var users = _userManager.Users;
+            var users = await _userManager.Users.ToListAsync();
             return View(users);
         }
 
@@ -79,6 +91,7 @@ namespace Auto.Controllers
                 return NotFound();
             }
 
+            ViewBag.PodrazdelenieId = new SelectList(_context.Podrazdelenies, "PodrazdelenieId", "PodrazdelenieName", user.PodrazdelenieId);
             return View(user);
         }
 
@@ -111,6 +124,7 @@ namespace Auto.Controllers
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
+                    _logger.LogInformation("User updated successfully.");
                     return RedirectToAction(nameof(Index));
                 }
                 foreach (var error in result.Errors)
@@ -118,6 +132,15 @@ namespace Auto.Controllers
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
+            else
+            {
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    _logger.LogWarning("Model state error: {ErrorMessage}", error.ErrorMessage);
+                }
+            }
+            ViewBag.PodrazdelenieId = new SelectList(_context.Podrazdelenies, "PodrazdelenieId", "PodrazdelenieName", model.PodrazdelenieId);
+            _logger.LogWarning("Model state is invalid.");
             return View(model);
         }
 

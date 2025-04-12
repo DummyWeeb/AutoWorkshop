@@ -1,15 +1,72 @@
-﻿@page
-@using Auto.Models
-@model CustomUser
+﻿@model IEnumerable<Auto.Models.CustomUser>
+
 @{
-    ViewData["Title"] = "Главная";
+    ViewData["Title"] = "Список пользователей";
 }
 
-<h1>Добро пожаловать</h1>
+<h1>Список пользователей</h1>
 
-@if (User.IsInRole("IT"))
-{
-    <p>
-        <a asp-controller="CustomUser" asp-action="Create">Добавить пользователя</a>
-    </p>
-}
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Surname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ima)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SecSurname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Age)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Podrazdelenie.PodrazdelenieName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Surname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ima)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SecSurname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Age)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Podrazdelenie.PodrazdelenieName)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Редактировать</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p>
+    <a asp-action="Create">Добавить нового пользователя</a>
+</p>
