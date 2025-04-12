@@ -1,0 +1,15 @@
+﻿@page
+@using Auto.Models
+@model CustomUser
+@{
+    ViewData["Title"] = "Главная";
+}
+
+<h1>Добро пожаловать</h1>
+
+@if (User.IsInRole("IT"))
+{
+    <p>
+        <a asp-controller="CustomUser" asp-action="Create">Добавить пользователя</a>
+    </p>
+}

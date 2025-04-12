@@ -50,21 +50,21 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 builder.Services.AddTransient<PdfService>();
 
-// Указание пути к библиотеке libwkhtmltox
+// РџСЂРѕРІРµСЂРєР° РїСѓС‚Рё Рє Р±РёР±Р»РёРѕС‚РµРєРµ libwkhtmltox
 var wkHtmlToPdfPath = Path.Combine(builder.Environment.ContentRootPath, "runtimes", "win-x64", "native", "libwkhtmltox.dll");
 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !File.Exists(wkHtmlToPdfPath))
 {
-    throw new FileNotFoundException("Не удалось найти библиотеку libwkhtmltox.dll", wkHtmlToPdfPath);
+    throw new FileNotFoundException("РќРµ СѓРґР°Р»РѕСЃСЊ РЅР°Р№С‚Рё Р±РёР±Р»РёРѕС‚РµРєСѓ libwkhtmltox.dll", wkHtmlToPdfPath);
 }
 
 var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
 
-// Логирование длины пути
-logger.LogInformation($"Длина пути до библиотеки libwkhtmltox.dll: {wkHtmlToPdfPath.Length} символов");
+// Р›РѕРіРёСЂРѕРІР°РЅРёРµ РґР»РёРЅС‹ РїСѓС‚Рё
+logger.LogInformation($"Р”Р»РёРЅР° РїСѓС‚Рё Рє Р±РёР±Р»РёРѕС‚РµРєРµ libwkhtmltox.dll: {wkHtmlToPdfPath.Length} СЃРёРјРІРѕР»РѕРІ");
 
 if (wkHtmlToPdfPath.Length > 255)
 {
-    throw new PathTooLongException("Путь до библиотеки libwkhtmltox.dll превышает 255 символов");
+    throw new PathTooLongException("РџСѓС‚СЊ Рє Р±РёР±Р»РёРѕС‚РµРєРµ libwkhtmltox.dll РїСЂРµРІС‹С€Р°РµС‚ 255 СЃРёРјРІРѕР»РѕРІ");
 }
 
 var app = builder.Build();

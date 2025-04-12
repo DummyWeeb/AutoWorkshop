@@ -1,0 +1,46 @@
+﻿@page
+@model Auto.Areas.Identity.Pages.Account.Manage.IndexModel
+@{
+    ViewData["Title"] = "Управление учетной записью";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<h1>Управление учетной записью</h1>
+<p>Измените настройки вашей учетной записи</p>
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <form id="profile-form" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="form-floating mb-3">
+                <input asp-for="Username" class="form-control" placeholder="Введите ваше имя пользователя." disabled />
+                <label asp-for="Username" class="form-label">Имя пользователя</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="CustomUser.Surname" class="form-control" placeholder="Введите вашу фамилию." disabled />
+                <label asp-for="CustomUser.Surname" class="form-label">Фамилия</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="CustomUser.Ima" class="form-control" placeholder="Введите ваше имя." disabled />
+                <label asp-for="CustomUser.Ima" class="form-label">Имя</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="CustomUser.SecSurname" class="form-control" placeholder="Введите ваше отчество." disabled />
+                <label asp-for="CustomUser.SecSurname" class="form-label">Отчество</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="CustomUser.Age" class="form-control" placeholder="Введите ваш возраст." disabled />
+                <label asp-for="CustomUser.Age" class="form-label">Возраст</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="CustomUser.Podrazdelenie.PodrazdelenieName" class="form-control" placeholder="Введите ваше подразделение." disabled />
+                <label asp-for="CustomUser.Podrazdelenie.PodrazdelenieName" class="form-label">Подразделение</label>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
