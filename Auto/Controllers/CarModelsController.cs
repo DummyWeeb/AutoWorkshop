@@ -85,6 +85,16 @@ namespace Auto.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Проверка на существование модели с таким же названием
+                var existingCarModel = await _context.CarModels
+                    .FirstOrDefaultAsync(cm => cm.Name == carModel.Name && cm.BrandId == carModel.BrandId);
+                if (existingCarModel != null)
+                {
+                    ModelState.AddModelError("Name", "Модель с таким названием уже существует.");
+                    ViewData["BrandId"] = new SelectList(_context.Brands, "BrandId", "Name", carModel.BrandId);
+                    return View(carModel);
+                }
+
                 if (logoFile != null)
                 {
                     string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "carmodels");
@@ -139,6 +149,16 @@ namespace Auto.Controllers
             {
                 try
                 {
+                    // Проверка на существование модели с таким же названием
+                    var existingCarModel = await _context.CarModels
+                        .FirstOrDefaultAsync(cm => cm.Name == carModel.Name && cm.BrandId == carModel.BrandId && cm.CarModelId != carModel.CarModelId);
+                    if (existingCarModel != null)
+                    {
+                        ModelState.AddModelError("Name", "Модель с таким названием уже существует.");
+                        ViewData["BrandList"] = new SelectList(_context.Brands, "BrandId", "Name", carModel.BrandId);
+                        return View(carModel);
+                    }
+
                     if (logoFile != null)
                     {
                         string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "carmodels");
@@ -167,7 +187,7 @@ namespace Auto.Controllers
                 }
                 return RedirectToAction(nameof(Index), new { brandId = carModel.BrandId });
             }
-            ViewData["BrandId"] = new SelectList(_context.Brands, "BrandId", "Name", carModel.BrandId);
+            ViewData["BrandList"] = new SelectList(_context.Brands, "BrandId", "Name", carModel.BrandId);
             return View(carModel);
         }
 

@@ -53,14 +53,21 @@ namespace Auto.Controllers
         }
 
         // POST: Suppliers/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("SupplierId,Name,Address,Phone,Email")] Supplier supplier)
         {
             if (ModelState.IsValid)
             {
+                // Проверка на существование поставщика с таким же названием
+                var existingSupplier = await _context.Suppliers
+                    .FirstOrDefaultAsync(s => s.Name == supplier.Name);
+                if (existingSupplier != null)
+                {
+                    ModelState.AddModelError("Name", "Поставщик с таким названием уже существует.");
+                    return View(supplier);
+                }
+
                 _context.Add(supplier);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -86,8 +93,6 @@ namespace Auto.Controllers
         }
 
         // POST: Suppliers/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("SupplierId,Name,Address,Phone,Email")] Supplier supplier)
@@ -101,6 +106,15 @@ namespace Auto.Controllers
             {
                 try
                 {
+                    // Проверка на существование поставщика с таким же названием
+                    var existingSupplier = await _context.Suppliers
+                        .FirstOrDefaultAsync(s => s.Name == supplier.Name && s.SupplierId != supplier.SupplierId);
+                    if (existingSupplier != null)
+                    {
+                        ModelState.AddModelError("Name", "Поставщик с таким названием уже существует.");
+                        return View(supplier);
+                    }
+
                     _context.Update(supplier);
                     await _context.SaveChangesAsync();
                 }

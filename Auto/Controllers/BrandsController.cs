@@ -65,6 +65,15 @@ namespace Auto.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Проверка на существование бренда с таким же названием
+                var existingBrand = await _context.Brands
+                    .FirstOrDefaultAsync(b => b.Name == brand.Name);
+                if (existingBrand != null)
+                {
+                    ModelState.AddModelError("Name", "Бренд с таким названием уже существует.");
+                    return View(brand);
+                }
+
                 if (logoFile != null)
                 {
                     string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "brands");
@@ -116,6 +125,15 @@ namespace Auto.Controllers
             {
                 try
                 {
+                    // Проверка на существование бренда с таким же названием
+                    var existingBrand = await _context.Brands
+                        .FirstOrDefaultAsync(b => b.Name == brand.Name && b.BrandId != brand.BrandId);
+                    if (existingBrand != null)
+                    {
+                        ModelState.AddModelError("Name", "Бренд с таким названием уже существует.");
+                        return View(brand);
+                    }
+
                     if (logoFile != null)
                     {
                         string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "brands");
