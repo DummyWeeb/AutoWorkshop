@@ -118,8 +118,12 @@ namespace Auto.Controllers
         {
             if (carModelId == null)
             {
-                // Перенаправление на страницу с ошибкой или на главную страницу
-                return RedirectToAction("Index", "Home");
+                var errorViewModel = new ErrorViewModel
+                {
+                    RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+                    ErrorMessage = "Создавать запчасть можно только перейдя в представление запчастей выбрав модель автомобиля"
+                };
+                return View("Error", errorViewModel);
             }
 
             if (ModelState.IsValid)
@@ -130,6 +134,18 @@ namespace Auto.Controllers
                     part.Name = $"{part.Name} для {carModel.Name}";
                     part.CarModels = new List<CarModel> { carModel };
                 }
+
+                // Проверка на существование запчасти с таким же названием
+                var existingPart = await _context.Parts
+                    .FirstOrDefaultAsync(p => p.Name == part.Name);
+                if (existingPart != null)
+                {
+                    ModelState.AddModelError("Name", "Запчасть с таким названием уже существует.");
+                    ViewBag.CarModelId = carModelId;
+                    ViewBag.CarModels = _context.CarModels.ToList();
+                    return View(part);
+                }
+
                 part.Quantity = 0; // Устанавливаем количество в 0
                 _context.Add(part);
                 await _context.SaveChangesAsync();
@@ -148,6 +164,7 @@ namespace Auto.Controllers
                 return RedirectToAction(nameof(Index), new { carModelId = carModelId });
             }
             ViewBag.CarModelId = carModelId;
+            ViewBag.CarModels = _context.CarModels.ToList();
             return View(part);
         }
 
