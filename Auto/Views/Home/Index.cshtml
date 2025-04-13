@@ -3,8 +3,44 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Перейти к списку марок автомобилей</p>
-    <p></p>
+    <h1 class="display-4">Добро пожаловать в Автомастерскую</h1>
+    <p class="lead">БУ "РКБ" Минздрава Чувашии.</p>
+    
+    <p class="mt-4">Перейти к списку марок автомобилей</p>
     <a asp-controller="Brands" asp-action="Index" class="btn btn-primary">Список марок</a>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                
+                <div class="card-body">
+                    <h5 class="card-title">Запчасти</h5>
+                    <p class="card-text">Список всех запчастей.</p>
+                    <a asp-controller="Parts" asp-action="Index" class="btn btn-primary">Все запчасти</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                
+                <div class="card-body">
+                    <h5 class="card-title">Заказы</h5>
+                    <p class="card-text">Список заказов.</p>
+                    <a asp-controller="Orders" asp-action="Index" class="btn btn-primary">Заказы</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                
+                <div class="card-body">
+                    <h5 class="card-title">Поставщики</h5>
+                    <p class="card-text">Информация о поставщиках.</p>
+                    <a asp-controller="Suppliers" asp-action="Index" class="btn btn-primary">Поставщики</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

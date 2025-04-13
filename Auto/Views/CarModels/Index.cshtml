@@ -7,51 +7,74 @@
 <h1>Модели машины: @ViewBag.BrandName</h1>
 
 <p>
-    <a asp-action="Create" asp-route-brandId="@ViewBag.BrandId" class="btn btn-primary" >Добавить новую модель</a>
+    <a asp-action="Create" asp-route-brandId="@ViewBag.BrandId" class="btn btn-primary">Добавить новую модель</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Year)
-            </th>
-            <th>
-                Марка
-            </th>
-            <th>
-                Логотип
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Year)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Brand.Name)
-                </td>
-                <td>
-                    @if (!string.IsNullOrEmpty(item.LogoPath))
-                    {
-                        <img src="@item.LogoPath" alt="Логотип" width="100" />
-                    }
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.CarModelId" asp-route-brandId="@ViewBag.BrandId">Редактировать</a> |
-                    <a asp-action="Delete" asp-route-id="@item.CarModelId" asp-route-brandId="@ViewBag.BrandId">Удалить</a> |
-                    <a asp-action="Index" asp-controller="Parts" asp-route-carModelId="@item.CarModelId">Запчасти</a>
-                </td>
-            </tr>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-3 mb-4">
+            <div class="car-model-card position-relative">
+                @if (!string.IsNullOrEmpty(item.LogoPath))
+                {
+                    <div class="car-model-logo-container">
+                        <img src="@item.LogoPath" alt="Логотип" class="img-fluid car-model-logo" />
+                    </div>
+                }
+                <div class="car-model-info position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center">
+                    <h5>@item.Name</h5>
+                    <p>@item.Year</p>
+                    <a asp-action="Edit" asp-route-id="@item.CarModelId" asp-route-brandId="@ViewBag.BrandId" class="btn btn-sm btn-warning mb-2">Редактировать</a>
+                    <a asp-action="Delete" asp-route-id="@item.CarModelId" asp-route-brandId="@ViewBag.BrandId" class="btn btn-sm btn-danger mb-2">Удалить</a>
+                    <a asp-action="Index" asp-controller="Parts" asp-route-carModelId="@item.CarModelId" class="btn btn-sm btn-primary">Запчасти</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .car-model-card {
+            overflow: hidden;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: transform 0.3s;
+            position: relative;
+            height: 200px; /* Фиксированная высота для карточек */
         }
-    </tbody>
-</table>
+
+            .car-model-card:hover {
+                transform: scale(1.05);
+            }
+
+        .car-model-logo-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .car-model-logo {
+            max-width: 100%;
+            max-height: 100%;
+            transition: filter 0.3s;
+        }
+
+        .car-model-card:hover .car-model-logo {
+            filter: blur(5px);
+        }
+
+        .car-model-info {
+            background-color: rgba(255, 255, 255, 0.8);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .car-model-card:hover .car-model-info {
+            opacity: 1;
+        }
+    </style>
+}
