@@ -27,53 +27,18 @@ namespace Auto.Controllers
             _logger = logger;
         }
 
-        // GET: CustomUser/Create
-        public IActionResult Create()
+        // GET: CustomUser/Register
+        public IActionResult Register()
         {
-            ViewBag.PodrazdelenieId = new SelectList(_context.Podrazdelenies, "PodrazdelenieId", "PodrazdelenieName");
-            return View();
-        }
-
-        // POST: CustomUser/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CustomUser model, string password)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = new CustomUser
-                {
-                    UserName = model.UserName,
-                    Email = model.Email,
-                    Surname = model.Surname,
-                    Ima = model.Ima,
-                    SecSurname = model.SecSurname,
-                    Age = model.Age,
-                    PodrazdelenieId = model.PodrazdelenieId
-                };
-
-                var result = await _userManager.CreateAsync(user, password);
-                if (result.Succeeded)
-                {
-                    // Добавление пользователя в роль
-                    await _userManager.AddToRoleAsync(user, "User");
-
-                    // Оставляем текущего пользователя в системе
-                    return RedirectToAction(nameof(Index));
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
-            ViewBag.PodrazdelenieId = new SelectList(_context.Podrazdelenies, "PodrazdelenieId", "PodrazdelenieName", model.PodrazdelenieId);
-            return View(model);
+            return Redirect("/Identity/Account/Register");
         }
 
         // GET: CustomUser/Index
         public async Task<IActionResult> Index()
         {
-            var users = await _userManager.Users.ToListAsync();
+            var users = await _context.CustomUsers
+                .Include(u => u.Podrazdelenie)
+                .ToListAsync();
             return View(users);
         }
 
