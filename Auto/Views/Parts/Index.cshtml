@@ -10,6 +10,12 @@
     <a asp-action="Create" asp-route-carModelId="@ViewBag.CarModelId" class="btn btn-primary">Добавить запчасть</a>
 </p>
 
+<form asp-action="Index" method="get" class="form-inline mb-3">
+    <input type="text" name="searchString" class="form-control mr-2" placeholder="Поиск запчасти" value="@ViewBag.CurrentFilter" />
+    <p></p>
+    <button type="submit" class="btn btn-primary">Поиск</button>
+</form>
+
 <table class="table">
     <thead>
         <tr>

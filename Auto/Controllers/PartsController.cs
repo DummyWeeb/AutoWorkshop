@@ -13,6 +13,7 @@ using DinkToPdf.Contracts;
 using Auto.Services;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using System.Diagnostics;
 
 namespace Auto.Controllers
 {
@@ -33,11 +34,18 @@ namespace Auto.Controllers
 
         // GET: Parts
         [Authorize(Roles = "IT, Warehouse, Administration")]
-        public async Task<IActionResult> Index(int? carModelId)
+        public async Task<IActionResult> Index(int? carModelId, string searchString)
         {
             if (carModelId == null)
             {
-                return View(await _context.Parts.ToListAsync());
+                var parts = from p in _context.Parts select p;
+
+                if (!string.IsNullOrEmpty(searchString))
+                {
+                    parts = parts.Where(p => p.Name.Contains(searchString));
+                }
+
+                return View(await parts.ToListAsync());
             }
             else
             {
@@ -47,12 +55,20 @@ namespace Auto.Controllers
                     return NotFound();
                 }
 
-                var partsForCarModel = await _context.Parts
-                    .Where(p => p.CarModels.Any(cm => cm.CarModelId == carModelId))
-                    .ToListAsync();
+                var partsForCarModel = from p in _context.Parts
+                                       where p.CarModels.Any(cm => cm.CarModelId == carModelId)
+                                       select p;
+
+                if (!string.IsNullOrEmpty(searchString))
+                {
+                    partsForCarModel = partsForCarModel.Where(p => p.Name.Contains(searchString));
+                }
+
                 ViewBag.CarModelId = carModelId;
                 ViewBag.CarModelName = carModel.Name;
-                return View(partsForCarModel);
+                ViewBag.CurrentFilter = searchString;
+
+                return View(await partsForCarModel.ToListAsync());
             }
         }
 
@@ -81,8 +97,12 @@ namespace Auto.Controllers
         {
             if (carModelId == null)
             {
-                // Перенаправление на страницу с ошибкой или на главную страницу
-                return RedirectToAction("Index", "Home");
+                var errorViewModel = new ErrorViewModel
+                {
+                    RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+                    ErrorMessage = "Создавать запчасть можно только перейдя в представление запчастей выбрав модель автомобиля"
+                };
+                return View("Error", errorViewModel);
             }
 
             ViewBag.CarModelId = carModelId;
