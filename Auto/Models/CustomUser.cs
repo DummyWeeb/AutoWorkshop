@@ -19,11 +19,6 @@ namespace Auto.Models
         [Display(Name = "Отчество")]
         public string? SecSurname { get; set; }
 
-        [Required(ErrorMessage = "Возраст обязателен.")]
-        [Range(18, 100, ErrorMessage = "Возраст должен быть от 18 до 100 лет.")]
-        [Display(Name = "Возраст")]
-        public int Age { get; set; }
-
         [Required(ErrorMessage = "Подразделение обязательно.")]
         [Display(Name = "Подразделение")]
         public int PodrazdelenieId { get; set; }

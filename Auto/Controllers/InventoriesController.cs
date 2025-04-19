@@ -32,7 +32,7 @@ namespace Auto.Controllers
         }
 
         // GET: Inventories
-        [Authorize(Roles = "IT, Warehouse, Administration")]
+        [Authorize(Roles = "IT, Warehouse, Administration, Procurement")]
         public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate, DateTime? writeOffStartDate, DateTime? writeOffEndDate)
         {
             var inventoriesQuery = _context.Inventories.Include(i => i.Part).AsQueryable();

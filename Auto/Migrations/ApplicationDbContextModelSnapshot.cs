@@ -461,9 +461,6 @@ namespace Auto.Migrations
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
-                    b.Property<int>("Age")
-                        .HasColumnType("int");
-
                     b.Property<string>("Ima")
                         .IsRequired()
                         .HasMaxLength(255)

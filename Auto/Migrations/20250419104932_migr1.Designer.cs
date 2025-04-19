@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Auto.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250410164915_migr1")]
+    [Migration("20250419104932_migr1")]
     partial class migr1
     {
         /// <inheritdoc />
@@ -463,9 +463,6 @@ namespace Auto.Migrations
             modelBuilder.Entity("Auto.Models.CustomUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.Property<int>("Age")
-                        .HasColumnType("int");
 
                     b.Property<string>("Ima")
                         .IsRequired()

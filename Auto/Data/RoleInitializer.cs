@@ -38,7 +38,6 @@ namespace Auto.Data
                     Surname = "Admin",
                     Ima = "Admin",
                     SecSurname = "Admin",
-                    Age = 30,
                     PodrazdelenieId = 3
                 };
                 var createAdmin = await userManager.CreateAsync(adminUser, adminPassword);

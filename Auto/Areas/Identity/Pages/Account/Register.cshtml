@@ -33,13 +33,8 @@
                 <span asp-validation-for="Input.SecSurName" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.Age" class="form-control" autocomplete="username" aria-required="true" />
-                <label asp-for="Input.Age">Возраст</label>
-                <span asp-validation-for="Input.Age" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
                 <select asp-for="Input.PodrazdelenieId" class="form-control"
-                        asp-items="@Model.Podrazdelenies">
+                        asp-items="Model.Podrazdelenies">
                     <option value="">Выберите подразделение...</option>
                 </select>
                 <label asp-for="Input.PodrazdelenieId">Подразделение</label>

@@ -83,7 +83,6 @@ namespace Auto.Controllers
                 user.Surname = model.Surname;
                 user.Ima = model.Ima;
                 user.SecSurname = model.SecSurname;
-                user.Age = model.Age;
                 user.PodrazdelenieId = model.PodrazdelenieId;
 
                 var result = await _userManager.UpdateAsync(user);
