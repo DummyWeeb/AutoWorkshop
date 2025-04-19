@@ -30,13 +30,11 @@ namespace Auto.Controllers
         {
             if (brandId == null)
             {
-                // Если brandId не указан, показываем все модели
                 var allModels = await _context.CarModels.Include(c => c.Brand).ToListAsync();
                 return View(allModels);
             }
             else
             {
-                // Если brandId указан, показываем модели только для этой марки
                 var modelsForBrand = await _context.CarModels
                     .Where(m => m.BrandId == brandId)
                     .Include(c => c.Brand)
@@ -85,12 +83,12 @@ namespace Auto.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Проверка на существование модели с таким же названием
+                // Проверка на существование модели с таким же названием и годом выпуска
                 var existingCarModel = await _context.CarModels
-                    .FirstOrDefaultAsync(cm => cm.Name == carModel.Name && cm.BrandId == carModel.BrandId);
+                    .FirstOrDefaultAsync(cm => cm.Name == carModel.Name && cm.Year == carModel.Year && cm.BrandId == carModel.BrandId);
                 if (existingCarModel != null)
                 {
-                    ModelState.AddModelError("Name", "Модель с таким названием уже существует.");
+                    ModelState.AddModelError("Name", "Модель с таким названием и годом выпуска уже существует.");
                     ViewData["BrandId"] = new SelectList(_context.Brands, "BrandId", "Name", carModel.BrandId);
                     return View(carModel);
                 }
@@ -149,12 +147,12 @@ namespace Auto.Controllers
             {
                 try
                 {
-                    // Проверка на существование модели с таким же названием
+                    // Проверка на существование модели с таким же названием и годом выпуска
                     var existingCarModel = await _context.CarModels
-                        .FirstOrDefaultAsync(cm => cm.Name == carModel.Name && cm.BrandId == carModel.BrandId && cm.CarModelId != carModel.CarModelId);
+                        .FirstOrDefaultAsync(cm => cm.Name == carModel.Name && cm.Year == carModel.Year && cm.BrandId == carModel.BrandId && cm.CarModelId != carModel.CarModelId);
                     if (existingCarModel != null)
                     {
-                        ModelState.AddModelError("Name", "Модель с таким названием уже существует.");
+                        ModelState.AddModelError("Name", "Модель с таким названием и годом выпуска уже существует.");
                         ViewData["BrandList"] = new SelectList(_context.Brands, "BrandId", "Name", carModel.BrandId);
                         return View(carModel);
                     }

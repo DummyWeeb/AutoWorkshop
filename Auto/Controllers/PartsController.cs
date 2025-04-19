@@ -131,7 +131,9 @@ namespace Auto.Controllers
                 var carModel = await _context.CarModels.FindAsync(carModelId);
                 if (carModel != null)
                 {
-                    part.Name = $"{part.Name} для {carModel.Name}";
+                    // Добавляем название модели и год выпуска к названию запчасти
+                    var year = carModel.Year.HasValue ? $" ({carModel.Year.Value})" : string.Empty;
+                    part.Name = $"{part.Name} для {carModel.Name}{year}";
                     part.CarModels = new List<CarModel> { carModel };
                 }
 
