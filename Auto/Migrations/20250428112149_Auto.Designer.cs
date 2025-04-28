@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Auto.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250419104932_migr1")]
-    partial class migr1
+    [Migration("20250428112149_Auto")]
+    partial class Auto
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -148,12 +148,7 @@ namespace Auto.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SupplierId")
-                        .HasColumnType("int");
-
                     b.HasKey("PartId");
-
-                    b.HasIndex("SupplierId");
 
                     b.ToTable("Parts");
                 });
@@ -519,13 +514,6 @@ namespace Auto.Migrations
                     b.Navigation("Supplier");
                 });
 
-            modelBuilder.Entity("Auto.Models.Part", b =>
-                {
-                    b.HasOne("Auto.Models.Supplier", null)
-                        .WithMany("Parts")
-                        .HasForeignKey("SupplierId");
-                });
-
             modelBuilder.Entity("CarModelPart", b =>
                 {
                     b.HasOne("Auto.Models.CarModel", null)
@@ -641,11 +629,6 @@ namespace Auto.Migrations
             modelBuilder.Entity("Auto.Models.Podrazdelenie", b =>
                 {
                     b.Navigation("CustomUser");
-                });
-
-            modelBuilder.Entity("Auto.Models.Supplier", b =>
-                {
-                    b.Navigation("Parts");
                 });
 #pragma warning restore 612, 618
         }

@@ -17,7 +17,7 @@ public class OrderPart
     [Display(Name = "Количество")]
     public int Quantity { get; set; }
 
-    public int? CarModelId { get; set; } // Сделаем CarModelId необязательным
+    public int? CarModelId { get; set; } 
     public CarModel? CarModel { get; set; }
     [NotMapped]
     public string? PartName { get; set; }

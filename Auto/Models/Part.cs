@@ -20,6 +20,6 @@ namespace Auto.Models
         public int Quantity { get; set; }
 
         // Связи
-        public virtual ICollection<CarModel>? CarModels { get; set; } // Добавлена коллекция CarModels
+        public virtual ICollection<CarModel>? CarModels { get; set; }
     }
 }

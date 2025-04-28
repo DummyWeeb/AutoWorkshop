@@ -26,7 +26,7 @@ namespace Auto.Data
                 }
             }
 
-            // Создание администратора
+            
             var adminEmail = "admin@auto.ru";
             var adminPassword = "Aa12345678!";
             if (userManager.Users.All(u => u.Email != adminEmail))

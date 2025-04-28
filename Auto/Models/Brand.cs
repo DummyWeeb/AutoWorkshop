@@ -15,8 +15,11 @@ namespace Auto.Models
         public string? Name { get; set; }
 
         [Display(Name = "Логотип")]
-        public string? LogoPath { get; set; } // Путь к логотипу
+        public string? LogoPath { get; set; } 
 
-        public virtual ICollection<CarModel>? Models { get; set; } // Список моделей
+        public virtual ICollection<CarModel>? Models { get; set; } 
     }
 }
+
+
+

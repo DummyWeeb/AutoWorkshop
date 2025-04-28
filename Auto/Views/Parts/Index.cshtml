@@ -11,8 +11,8 @@
 </p>
 
 <form asp-action="Index" method="get" class="form-inline mb-3">
+    <input type="hidden" name="carModelId" value="@ViewBag.CarModelId" />
     <input type="text" name="searchString" class="form-control mr-2" placeholder="Поиск запчасти" value="@ViewBag.CurrentFilter" />
-    <p></p>
     <button type="submit" class="btn btn-primary">Поиск</button>
 </form>
 
@@ -47,3 +47,6 @@
         }
     </tbody>
 </table>
+<p>
+    <a asp-action="Index" asp-controller="CarModels" asp-route-brandId="@ViewBag.BrandId" class="btn btn-secondary">Назад</a>
+</p>

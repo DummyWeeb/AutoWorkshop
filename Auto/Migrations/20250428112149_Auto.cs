@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Auto.Migrations
 {
     /// <inheritdoc />
-    public partial class migr1 : Migration
+    public partial class Auto : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -37,6 +37,20 @@ namespace Auto.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Brands", x => x.BrandId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Parts",
+                columns: table => new
+                {
+                    PartId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Parts", x => x.PartId);
                 });
 
             migrationBuilder.CreateTable(
@@ -112,6 +126,28 @@ namespace Auto.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Inventories",
+                columns: table => new
+                {
+                    InventoryId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    поступления = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    списания = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    PartId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Inventories", x => x.InventoryId);
+                    table.ForeignKey(
+                        name: "FK_Inventories_Parts_PartId",
+                        column: x => x.PartId,
+                        principalTable: "Parts",
+                        principalColumn: "PartId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
@@ -171,23 +207,27 @@ namespace Auto.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Parts",
+                name: "CarModelPart",
                 columns: table => new
                 {
-                    PartId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    SupplierId = table.Column<int>(type: "int", nullable: true)
+                    CarModelsCarModelId = table.Column<int>(type: "int", nullable: false),
+                    PartsPartId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Parts", x => x.PartId);
+                    table.PrimaryKey("PK_CarModelPart", x => new { x.CarModelsCarModelId, x.PartsPartId });
                     table.ForeignKey(
-                        name: "FK_Parts_Suppliers_SupplierId",
-                        column: x => x.SupplierId,
-                        principalTable: "Suppliers",
-                        principalColumn: "SupplierId");
+                        name: "FK_CarModelPart_CarModels_CarModelsCarModelId",
+                        column: x => x.CarModelsCarModelId,
+                        principalTable: "CarModels",
+                        principalColumn: "CarModelId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CarModelPart_Parts_PartsPartId",
+                        column: x => x.PartsPartId,
+                        principalTable: "Parts",
+                        principalColumn: "PartId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -272,52 +312,6 @@ namespace Auto.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CarModelPart",
-                columns: table => new
-                {
-                    CarModelsCarModelId = table.Column<int>(type: "int", nullable: false),
-                    PartsPartId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CarModelPart", x => new { x.CarModelsCarModelId, x.PartsPartId });
-                    table.ForeignKey(
-                        name: "FK_CarModelPart_CarModels_CarModelsCarModelId",
-                        column: x => x.CarModelsCarModelId,
-                        principalTable: "CarModels",
-                        principalColumn: "CarModelId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CarModelPart_Parts_PartsPartId",
-                        column: x => x.PartsPartId,
-                        principalTable: "Parts",
-                        principalColumn: "PartId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Inventories",
-                columns: table => new
-                {
-                    InventoryId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    поступления = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    списания = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    PartId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Inventories", x => x.InventoryId);
-                    table.ForeignKey(
-                        name: "FK_Inventories_Parts_PartId",
-                        column: x => x.PartId,
-                        principalTable: "Parts",
-                        principalColumn: "PartId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -431,11 +425,6 @@ namespace Auto.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_SupplierId",
                 table: "Orders",
-                column: "SupplierId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Parts_SupplierId",
-                table: "Parts",
                 column: "SupplierId");
         }
 

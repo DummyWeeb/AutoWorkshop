@@ -21,7 +21,7 @@ namespace Auto.Models
         public OrderStatus Status { get; set; } = OrderStatus.Заказано;
 
         [Display(Name = "Номер заказа")]
-        public int OrderNumber => OrderId; // Используем OrderId в качестве номера заказа
+        public int OrderNumber => OrderId;
 
         // Связи
         public int SupplierId { get; set; }

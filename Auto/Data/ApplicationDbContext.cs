@@ -23,11 +23,11 @@ namespace Auto.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Many-to-Many relationship between CarModel and Part
+        
             modelBuilder.Entity<CarModel>()
                 .HasMany(c => c.Parts)
                 .WithMany(p => p.CarModels)
-                .UsingEntity(j => j.ToTable("CarModelPart")); // Optional: Specify the joining table name
+                .UsingEntity(j => j.ToTable("CarModelPart")); 
         }
     }
 }

@@ -26,3 +26,4 @@ namespace Auto.Models
         public virtual Podrazdelenie Podrazdelenie { get; set; }
     }
 }
+

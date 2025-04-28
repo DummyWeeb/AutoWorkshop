@@ -28,6 +28,5 @@ public class CustomIdentityErrorDescriber : IdentityErrorDescriber
             Description = $"Пароль должен быть не менее {length} символов."
         };
     }
-
-    // Добавьте другие методы для локализации других сообщений об ошибках
 }
+

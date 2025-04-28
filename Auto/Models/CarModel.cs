@@ -15,14 +15,15 @@ namespace Auto.Models
         public string? Name { get; set; }
 
         [Display(Name = "Год выпуска")]
-        public int? Year { get; set; } // Год выпуска модели (опционально)
+        public int? Year { get; set; } 
 
         [Display(Name = "Логотип")]
-        public string? LogoPath { get; set; } // Путь к логотипу
+        public string? LogoPath { get; set; } 
 
         // Связи
-        public int BrandId { get; set; } // Внешний ключ к марке
-        public Brand? Brand { get; set; } // Навигационное свойство для марки
-        public virtual ICollection<Part>? Parts { get; set; } // Many-to-many связь с запчастями
+        public int BrandId { get; set; } 
+        public Brand? Brand { get; set; } 
+        public virtual ICollection<Part>? Parts { get; set; } 
     }
 }
+
