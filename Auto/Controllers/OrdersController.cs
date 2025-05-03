@@ -287,7 +287,7 @@ namespace Auto.Controllers
                     part.Quantity += orderPart.Quantity;
                     _context.SaveChanges();
 
-                    // Обновление инвентаря
+                    
                     var inventory = new Inventory
                     {
                         PartId = part.PartId,

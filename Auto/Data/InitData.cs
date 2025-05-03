@@ -10,7 +10,7 @@ namespace Auto.Data
         {
             using (var context = new ApplicationDbContext(serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
             {
-                // Проверка и добавление подразделений
+               
                 if (!context.Podrazdelenies.Any(p => p.PodrazdelenieName == "Отдел закупок"))
                 {
                     Podrazdelenie podrazdelenie1 = new()

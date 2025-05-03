@@ -135,7 +135,7 @@ namespace Auto.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    // Назначение роли в зависимости от подразделения
+                    
                     var podrazdelenie = await _context.Podrazdelenies.FindAsync(Input.PodrazdelenieId);
                     if (podrazdelenie != null)
                     {
@@ -174,7 +174,7 @@ namespace Auto.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        // Не входить в систему под новым пользователем
+                        
                         return RedirectToAction("Index", "CustomUser", new { area = "" });
                     }
                 }
@@ -184,7 +184,7 @@ namespace Auto.Areas.Identity.Pages.Account
                 }
             }
 
-            // Если произошла ошибка, повторно отобразить форму с подразделениями
+            
             return Page();
         }
 

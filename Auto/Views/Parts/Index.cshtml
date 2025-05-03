@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = $"Запчасти для модели: {ViewBag.CarModelName}";
+    string currentSort = ViewBag.CurrentSort as string;
+    string nameSortParam = string.IsNullOrEmpty(currentSort) ? "name_desc" : "";
+    string quantitySortParam = currentSort == "quantity" ? "quantity_desc" : "quantity";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -13,14 +16,24 @@
 <form asp-action="Index" method="get" class="form-inline mb-3">
     <input type="hidden" name="carModelId" value="@ViewBag.CarModelId" />
     <input type="text" name="searchString" class="form-control mr-2" placeholder="Поиск запчасти" value="@ViewBag.CurrentFilter" />
+    <p></p>
     <button type="submit" class="btn btn-primary">Поиск</button>
+    <a asp-action="Index" asp-route-carModelId="@ViewBag.CarModelId" class="btn btn-secondary ml-2">Очистить поиск</a>
 </form>
 
 <table class="table">
     <thead>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.Name)</th>
-            <th>@Html.DisplayNameFor(model => model.Quantity)</th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@nameSortParam" asp-route-carModelId="@ViewBag.CarModelId" asp-route-searchString="@ViewBag.CurrentFilter">
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().Name)
+                </a>
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@quantitySortParam" asp-route-carModelId="@ViewBag.CarModelId" asp-route-searchString="@ViewBag.CurrentFilter">
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().Quantity)
+                </a>
+            </th>
             <th></th>
         </tr>
     </thead>

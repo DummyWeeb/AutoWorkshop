@@ -55,7 +55,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Where(i => i.Quantity != 0))
         {
             <tr>
                 <td>@Html.DisplayFor(modelItem => item.Part.Name)</td>

@@ -34,42 +34,51 @@ namespace Auto.Controllers
 
         // GET: Parts
         [Authorize(Roles = "IT, Warehouse, Administration")]
-        public async Task<IActionResult> Index(int? carModelId, string searchString)
+        public async Task<IActionResult> Index(int? carModelId, string searchString, string sortOrder)
         {
-            if (carModelId == null)
-            {
-                var parts = from p in _context.Parts select p;
+            IQueryable<Part> partsQuery = _context.Parts;
 
-                if (!string.IsNullOrEmpty(searchString))
-                {
-                    parts = parts.Where(p => p.Name.Contains(searchString));
-                }
-
-                return View(await parts.ToListAsync());
-            }
-            else
+            if (carModelId != null)
             {
-                var carModel = await _context.CarModels.FindAsync(carModelId);
+                var carModel = await _context.CarModels
+                    .Include(cm => cm.Brand)
+                    .FirstOrDefaultAsync(cm => cm.CarModelId == carModelId);
+
                 if (carModel == null)
                 {
                     return NotFound();
                 }
 
-                var partsForCarModel = from p in _context.Parts
-                                       where p.CarModels.Any(cm => cm.CarModelId == carModelId)
-                                       select p;
-
-                if (!string.IsNullOrEmpty(searchString))
-                {
-                    partsForCarModel = partsForCarModel.Where(p => p.Name.Contains(searchString));
-                }
-
                 ViewBag.CarModelId = carModelId;
                 ViewBag.CarModelName = carModel.Name;
-                ViewBag.CurrentFilter = searchString;
+                ViewBag.BrandId = carModel.BrandId;
 
-                return View(await partsForCarModel.ToListAsync());
+                partsQuery = partsQuery.Where(p => p.CarModels.Any(cm => cm.CarModelId == carModelId));
             }
+            else
+            {
+                ViewBag.CarModelId = null;
+                ViewBag.CarModelName = "Все запчасти";
+            }
+
+            ViewBag.CurrentFilter = searchString;
+            ViewBag.CurrentSort = sortOrder;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                partsQuery = partsQuery.Where(p => p.Name.Contains(searchString));
+            }
+
+            partsQuery = sortOrder switch
+            {
+                "name_desc" => partsQuery.OrderByDescending(p => p.Name),
+                "quantity" => partsQuery.OrderBy(p => p.Quantity),
+                "quantity_desc" => partsQuery.OrderByDescending(p => p.Quantity),
+                _ => partsQuery.OrderBy(p => p.Name),
+            };
+
+            var parts = await partsQuery.ToListAsync();
+            return View(parts);
         }
 
         // GET: Parts/Details/5
@@ -131,13 +140,11 @@ namespace Auto.Controllers
                 var carModel = await _context.CarModels.FindAsync(carModelId);
                 if (carModel != null)
                 {
-                    // Добавляем название модели и год выпуска к названию запчасти
                     var year = carModel.Year.HasValue ? $" ({carModel.Year.Value})" : string.Empty;
                     part.Name = $"{part.Name} для {carModel.Name}{year}";
                     part.CarModels = new List<CarModel> { carModel };
                 }
 
-                // Проверка на существование запчасти с таким же названием
                 var existingPart = await _context.Parts
                     .FirstOrDefaultAsync(p => p.Name == part.Name);
                 if (existingPart != null)
@@ -148,11 +155,10 @@ namespace Auto.Controllers
                     return View(part);
                 }
 
-                part.Quantity = 0; // Устанавливаем количество в 0
+                part.Quantity = 0;
                 _context.Add(part);
                 await _context.SaveChangesAsync();
 
-                // Обновление инвентаря
                 var inventory = new Inventory
                 {
                     PartId = part.PartId,
@@ -206,7 +212,6 @@ namespace Auto.Controllers
                     _context.Update(part);
                     await _context.SaveChangesAsync();
 
-                    // Обновление инвентаря
                     var inventory = new Inventory
                     {
                         PartId = part.PartId,
@@ -268,7 +273,6 @@ namespace Auto.Controllers
                     return View(part);
                 }
 
-                // Помечаем запчасть как удаленную
                 part.Name += " (удалено)";
                 _context.Parts.Update(part);
                 await _context.SaveChangesAsync();
@@ -298,7 +302,6 @@ namespace Auto.Controllers
                 part.Quantity--;
                 await _context.SaveChangesAsync();
 
-                // Обновление инвентаря
                 var inventory = new Inventory
                 {
                     PartId = part.PartId,

@@ -36,12 +36,14 @@ namespace Auto.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "Поле \"Эл. почта\" обязательно.")]
+            [EmailAddress(ErrorMessage = "Введите корректный адрес электронной почты.")]
+            [Display(Name = "Эл. почта")]
             public string Email { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Поле \"Пароль\" обязательно.")]
             [DataType(DataType.Password)]
+            [Display(Name = "Пароль")]
             public string Password { get; set; }
 
             [Display(Name = "Запомнить меня?")]

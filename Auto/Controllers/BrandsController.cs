@@ -65,7 +65,7 @@ namespace Auto.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Проверка на существование бренда с таким же названием
+                
                 var existingBrand = await _context.Brands
                     .FirstOrDefaultAsync(b => b.Name == brand.Name);
                 if (existingBrand != null)
@@ -125,7 +125,7 @@ namespace Auto.Controllers
             {
                 try
                 {
-                    // Проверка на существование бренда с таким же названием
+                   
                     var existingBrand = await _context.Brands
                         .FirstOrDefaultAsync(b => b.Name == brand.Name && b.BrandId != brand.BrandId);
                     if (existingBrand != null)
