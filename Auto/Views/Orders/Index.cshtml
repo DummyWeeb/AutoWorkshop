@@ -108,7 +108,7 @@
                     @Html.DisplayFor(modelItem => item.Status)
                 </td>
                 <td>
-                    @if (item.Status == OrderStatus.Заказано)
+                    @if (!isPdf && item.Status == OrderStatus.Заказано)
                     {
                         <form asp-action="MarkAsArrived" method="post" style="display:inline;">
                             <input type="hidden" name="orderId" value="@item.OrderId" />

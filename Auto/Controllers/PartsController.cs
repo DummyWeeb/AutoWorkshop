@@ -54,11 +54,17 @@ namespace Auto.Controllers
                 ViewBag.BrandId = carModel.BrandId;
 
                 partsQuery = partsQuery.Where(p => p.CarModels.Any(cm => cm.CarModelId == carModelId));
+
+                // Сохраняем информацию о переходе через модель
+                TempData["CameFromModel"] = true;
             }
             else
             {
                 ViewBag.CarModelId = null;
                 ViewBag.CarModelName = "Все запчасти";
+
+                // Сохраняем информацию о переходе с главной страницы
+                TempData["CameFromModel"] = false;
             }
 
             ViewBag.CurrentFilter = searchString;

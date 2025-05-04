@@ -61,5 +61,12 @@
     </tbody>
 </table>
 <p>
-    <a asp-action="Index" asp-controller="CarModels" asp-route-brandId="@ViewBag.BrandId" class="btn btn-secondary">Назад</a>
+    @if (TempData["CameFromModel"] != null && (bool)TempData["CameFromModel"])
+    {
+        <a asp-action="Index" asp-controller="CarModels" asp-route-brandId="@ViewBag.BrandId" class="btn btn-secondary">Назад</a>
+    }
+    else
+    {
+        <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Назад</a>
+    }
 </p>
